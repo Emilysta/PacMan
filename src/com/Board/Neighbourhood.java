@@ -7,4 +7,5 @@ public class Neighbourhood {
         public int m_bottom = 0;
         public int m_right = 0;
 
+
 }
