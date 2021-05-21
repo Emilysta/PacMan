@@ -1,7 +1,7 @@
 package com;
 
+import com.Board.PredefinedBoard;
 import com.GameLoop.GameLoop;
-import com.GameLoop.InputManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -45,6 +45,8 @@ public class Main extends Application {
         primaryStage.getIcons().add(new Image("file:icon.png"));
         m_mainStage.setResizable(false);
         primaryStage.show();
+        PredefinedBoard board = new PredefinedBoard();
+        board.loadFromFile(PredefinedBoard.randFile());
     }
 
     public void startGame(){

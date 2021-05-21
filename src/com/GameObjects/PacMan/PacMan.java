@@ -19,7 +19,7 @@ public class PacMan extends GameObject {
 
     @Override
     protected void onUpdate() {
-        m_controllerThread.start();
+
     }
 
 }
