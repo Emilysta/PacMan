@@ -1,24 +1,19 @@
 package com.Board;
 
-public class BoardTile {
-    private int m_top = 0;
-    private int m_left = 0;
-    private int m_bottom = 0;
-    private int m_right = 0;
 
+public class BoardTile {
+
+    private Neighbourhood m_NGBH = new Neighbourhood();
     public void setTilesAround(int top, int left, int bottom, int right)
     {
-        m_top = top;
-        m_left = left;
-        m_bottom = bottom;
-        m_right = right;
+        m_NGBH.m_top = top;
+        m_NGBH.m_left = left;
+        m_NGBH.m_bottom = bottom;
+        m_NGBH.m_right = right;
     }
 
-    public void getTilesAround(int top, int left, int bottom, int right)
+    public Neighbourhood getTilesAround()
     {
-        top = m_top;
-        left = m_left;
-        bottom = m_bottom;
-        right = m_right; //toDo check changing values
+        return m_NGBH;
     }
 }

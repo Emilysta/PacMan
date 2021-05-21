@@ -13,7 +13,7 @@ public class MainWindowController {
     private Button StartGameButton;
 
     public void StartGameAction(MouseEvent mouseEvent) {
-        Main.getInstance().startGame();
+        Main.getInstance().goToBoard();
     }
 
     public void ExitAction(MouseEvent mouseEvent) {

@@ -1,6 +1,6 @@
 package com;
 
-import com.Board.PredefinedBoard;
+import com.UI.BoardController;
 import com.GameLoop.GameLoop;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -41,17 +41,15 @@ public class Main extends Application {
         m_mainStage = primaryStage;
         Parent root = FXMLLoader.load(getClass().getResource("../com/UI/MainWindow.fxml"));
         primaryStage.setTitle("PacManFX");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        primaryStage.setScene(new Scene(root, 560, 720));
         primaryStage.getIcons().add(new Image("file:icon.png"));
         m_mainStage.setResizable(false);
         primaryStage.show();
-        PredefinedBoard board = new PredefinedBoard();
-        board.loadFromFile(PredefinedBoard.randFile());
     }
 
     public void startGame(){
         try {
-            replaceSceneContent("../com/UI/GameWindow.fxml");
+            BoardController boardController = new BoardController();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,11 +71,20 @@ public class Main extends Application {
         }
     }
 
-    private Parent replaceSceneContent(String fxml) throws Exception {
+    public void goToBoard() {
+        try{
+            replaceSceneContent("../com/UI/Board.fxml");
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public Parent replaceSceneContent(String fxml) throws Exception {
         Parent page = FXMLLoader.load(getClass().getResource(fxml));
         Scene scene = m_mainStage.getScene();
         if (scene == null) {
-            scene = new Scene(page, 700, 450);
+            scene = new Scene(page);
             m_mainStage.setScene(scene);
         } else {
             m_mainStage.getScene().setRoot(page);

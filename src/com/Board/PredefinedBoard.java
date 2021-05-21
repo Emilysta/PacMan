@@ -1,15 +1,33 @@
 package com.Board;
 
-import java.io.*;
-import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
+/**
+ * Klasa pozwalająca wczytać predefiniowane plansze do gry
+ */
 public class PredefinedBoard {
 
+    /**
+     * Tablica określająca sąsiadów konkrentego pola
+     */
     public BoardTile[][] Board = new BoardTile[31][28];
-    public int[][] BoardsPaths = new int[31][28];
+    /**
+     * Tablica określająca położenie ścieżek, którymi pac-man oraz duszki mogą się poruszać
+     * Zawiera 0, gdy pole jest przestrzenią zabronioną
+     * Zawiera 1, gdy pole jest ścieżką
+     */
+    public int[][] BoardsPaths = new int[31][28]; //with 0,1
+    /**
+     * Tablica pomocnicza, pozwala określić jaki typ drogi jest potrzebny do wczytania ze zdjęcia
+     * Zawiera komórki typu: RoadTypes.
+     */
+    public PathTypes[][] BoardPathTypes = new PathTypes[31][28];
 
     /**
      * Metoda losująca nazwę pliku zawierającego wygląd planszy
+     *
      * @return zwraca nazwę pliku zwierającego wygląd planszy
      */
     public static String randFile() {
@@ -21,6 +39,7 @@ public class PredefinedBoard {
 
     /**
      * Metoda pobierająca wygląd planszy z pliku o nazwie fileName
+     *
      * @param fileName nazwa pliku zawierającego planszę
      */
     public void loadFromFile(String fileName) {
@@ -49,10 +68,11 @@ public class PredefinedBoard {
         }
         //System.out.print(BoardsPaths);
         makeUpBoardTileArray();
+        setPathTypes();
     }
 
     /**
-     *  Metoda uzupełniająca tablicę sąsiadów każdego pola na potrzeby tworzenia właściwych ścieżek na mapie
+     * Metoda uzupełniająca tablicę sąsiadów każdego pola na potrzeby tworzenia właściwych ścieżek na mapie
      */
     private void makeUpBoardTileArray() {
         for (int i = 0; i < Board.length; i++) {
@@ -61,57 +81,105 @@ public class PredefinedBoard {
                 int left = 0;
                 int bottom = 0;
                 int right = 0;
-                if (i == 0 || j == 0 || i == (Board.length - 1) || j == (Board[i].length - 1)) {
-                    if (i == 0 && j == 0) { //lewy górny rarożnik
-                        top = -1;
-                        left = -1;
-                        bottom = BoardsPaths[i + 1][j];
-                        right = BoardsPaths[i][j + 1];
-                    } else if (j == 0 && i == (Board.length - 1)) { //lewy dolny narożnik
-                        left = -1;
-                        bottom = -1;
-                        right = BoardsPaths[i][j + 1];
+                if (BoardsPaths[i][j] != 0) {
+                    if (i == 0 || j == 0 || i == (Board.length - 1) || j == (Board[i].length - 1)) {
+                        if (i == 0 && j == 0) { //lewy górny rarożnik
+                            top = -1;
+                            left = -1;
+                            bottom = BoardsPaths[i + 1][j];
+                            right = BoardsPaths[i][j + 1];
+                        } else if (j == 0 && i == (Board.length - 1)) { //lewy dolny narożnik
+                            left = -1;
+                            bottom = -1;
+                            right = BoardsPaths[i][j + 1];
+                            top = BoardsPaths[i - 1][j];
+                        } else if (i == 0 && j == (Board[i].length - 1)) { //prawy górny narożnik
+                            top = -1;
+                            right = -1;
+                            left = BoardsPaths[i][j - 1];
+                            bottom = BoardsPaths[i + 1][j];
+                        } else if (i == (Board.length - 1) && j == (Board[i].length - 1)) { //prawy dolny narożnik
+                            right = -1;
+                            bottom = -1;
+                            top = BoardsPaths[i - 1][j];
+                            left = BoardsPaths[i][j - 1];
+                        } else if (j == 0) { //lewy bok
+                            left = -1;
+                            top = BoardsPaths[i - 1][j];
+                            bottom = BoardsPaths[i + 1][j];
+                            right = BoardsPaths[i][j + 1];
+                        } else if (i == 0) { //górny bok
+                            top = -1;
+                            left = BoardsPaths[i][j - 1];
+                            bottom = BoardsPaths[i + 1][j];
+                            right = BoardsPaths[i][j + 1];
+                        } else if (i == (Board.length - 1)) { //dolny bok
+                            bottom = -1;
+                            left = BoardsPaths[i][j - 1];
+                            top = BoardsPaths[i - 1][j];
+                            right = BoardsPaths[i][j + 1];
+                        } else if (j == (Board[i].length - 1)) //prawy bok
+                        {
+                            right = -1;
+                            left = BoardsPaths[i][j - 1];
+                            top = BoardsPaths[i - 1][j];
+                            bottom = BoardsPaths[i + 1][j];
+                        }
+                    } else {
                         top = BoardsPaths[i - 1][j];
-                    } else if (i == 0 && j == (Board[i].length - 1)) { //prawy górny narożnik
-                        top = -1;
-                        right = -1;
-                        left = BoardsPaths[i][j - 1];
                         bottom = BoardsPaths[i + 1][j];
-                    } else if (i == (Board.length - 1) && j == (Board[i].length - 1)) { //prawy dolny narożnik
-                        right = -1;
-                        bottom = -1;
-                        top = BoardsPaths[i - 1][j];
                         left = BoardsPaths[i][j - 1];
-                    } else if (j == 0) { //lewy bok
-                        left = -1;
-                        top = BoardsPaths[i - 1][j];
-                        bottom = BoardsPaths[i + 1][j];
                         right = BoardsPaths[i][j + 1];
-                    } else if (i == 0) { //górny bok
-                        top = -1;
-                        left = BoardsPaths[i][j - 1];
-                        bottom = BoardsPaths[i + 1][j];
-                        right = BoardsPaths[i][j + 1];
-                    } else if (i == (Board.length - 1) ) { //dolny bok
-                        bottom = -1;
-                        left = BoardsPaths[i][j - 1];
-                        top = BoardsPaths[i -1][j];
-                        right = BoardsPaths[i][j + 1];
-                    } else if( j == (Board[i].length-1)) //prawy bok
-                    {
-                        right = -1;
-                        left = BoardsPaths[i][j - 1];
-                        top = BoardsPaths[i -1][j];
-                        bottom = BoardsPaths[i+1][j];
                     }
                 } else {
-                    top = BoardsPaths[i - 1][j];
-                    bottom = BoardsPaths[i + 1][j];
-                    left = BoardsPaths[i][j - 1];
-                    right = BoardsPaths[i][j + 1];
+                    top = -1;
+                    bottom = -1;
+                    left = -1;
+                    right = -1;
                 }
                 Board[i][j] = new BoardTile();
                 Board[i][j].setTilesAround(top, left, bottom, right);
+            }
+        }
+    }
+
+    public void setPathTypes() {
+        for (int i = 0; i < Board.length; i++) {
+            for (int j = 0; j < Board[i].length; j++) {
+                int top = -1;
+                int left = -1;
+                int bottom = -1;
+                int right = -1;
+                Neighbourhood ngbh = Board[i][j].getTilesAround();
+                top = ngbh.m_top;
+                left = ngbh.m_left;
+                bottom = ngbh.m_bottom;
+                right = ngbh.m_right;
+                if (top == -1 || left == -1 || bottom == -1 || right == -1) {
+                    BoardPathTypes[i][j] = PathTypes.EMPTY;
+                } else if (top == 1 && left == 1 && bottom == 1 && right == 1) {
+                    BoardPathTypes[i][j] = PathTypes.JUNCTION;
+                } else if (top == 1 && left == 1 && right == 0 && bottom == 0) {
+                    BoardPathTypes[i][j] = PathTypes.TOP_LEFT;
+                } else if (top == 1 && left == 0 && right == 0 && bottom == 1) {
+                    BoardPathTypes[i][j] = PathTypes.VERTICAL;
+                } else if (top == 0 && left == 1 && right == 1 && bottom == 0) {
+                    BoardPathTypes[i][j] = PathTypes.HORIZONTAL;
+                } else if (top == 1 && right == 1 && left == 0 && bottom == 0) {
+                    BoardPathTypes[i][j] = PathTypes.TOP_RIGHT;
+                } else if (bottom == 1 && left == 1 && right == 0 && top == 0) {
+                    BoardPathTypes[i][j] = PathTypes.LEFT_BOTTOM;
+                } else if (bottom == 1 && right == 1 && left == 0 && top == 0) {
+                    BoardPathTypes[i][j] = PathTypes.RIGHT_BOTTOM;
+                } else if (bottom == 1 && right == 1 && left == 1 && top == 0) {
+                    BoardPathTypes[i][j] = PathTypes.LEFT_BOTTOM_RIGHT;
+                } else if (bottom == 0 && right == 1 && left == 1 && top == 1) {
+                    BoardPathTypes[i][j] = PathTypes.LEFT_TOP_RIGHT;
+                } else if (bottom == 1 && right == 0 && left == 1 && top == 1) {
+                    BoardPathTypes[i][j] = PathTypes.TOP_LEFT_BOTTOM;
+                } else if (bottom == 1 && right == 1 && left == 0 && top == 1) {
+                    BoardPathTypes[i][j] = PathTypes.TOP_RIGHT_BOTTOM;
+                }
             }
         }
     }
