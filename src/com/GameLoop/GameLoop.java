@@ -1,7 +1,9 @@
 package com.GameLoop;
 
+import com.Board.PredefinedBoard;
 import com.GameObjects.GameObject;
 import com.Utility.Debug;
+import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
 
@@ -13,16 +15,24 @@ import java.util.ArrayList;
  */
 public class GameLoop implements Runnable {
 
+    public PredefinedBoard gameBoard;
+
     private static GameLoop m_instance;
-    private final int m_fps = 1;
+    private final int m_fps = 30;
     private final ArrayList<GameObject> m_listeners;
     private Thread m_mainThread;
     private boolean m_isGamePlaying = false;
-    private InputManager inputManager;
+    private final InputManager inputManager;
+
+    private Renderer m_mainRenderer;
 
     private GameLoop() {
         inputManager = InputManager.getInstance();
         m_listeners = new ArrayList<>();
+    }
+
+    public boolean isGameRunning(){
+        return m_isGamePlaying;
     }
 
     /**
@@ -49,6 +59,24 @@ public class GameLoop implements Runnable {
         if (!m_listeners.contains((gameObject))) {
             m_listeners.add(gameObject);
         }
+        if(m_isGamePlaying)
+            gameObject.start();
+    }
+
+    /**
+     * Method sets the graphicContext on which all gameObjects will be rendered
+     * @param graphicsContext - canvas context on which to render
+     */
+    public void setGraphicContext(GraphicsContext graphicsContext, double width, double height) {
+        m_mainRenderer = new Renderer(graphicsContext,width,height);
+    }
+
+    /**
+     * Method sets the current board on which the game is being played
+     * @param board PredefinedBoard with parameters
+     */
+    public void setBoard(PredefinedBoard board){
+        gameBoard = board;
     }
 
     /**
@@ -104,12 +132,19 @@ public class GameLoop implements Runnable {
                 e.printStackTrace();
             }
         }
+        stopAllGameObjects();
     }
 
     private void playGameLoop(long frameTime, long lastLoopTime) {
         while (System.nanoTime() < lastLoopTime + frameTime) ;
         updateAllGameObjects();
+        renderGameObjects();
         inputManager.EndFrame();
+    }
+
+    private void startAllGameObjects() {
+        for (GameObject gameObject : m_listeners)
+            gameObject.start();
     }
 
     private void updateAllGameObjects() {
@@ -117,8 +152,15 @@ public class GameLoop implements Runnable {
             gameObject.update();
     }
 
-    private void startAllGameObjects() {
+    private void renderGameObjects() {
+        m_mainRenderer.prepareScene();
         for (GameObject gameObject : m_listeners)
-            gameObject.start();
+            m_mainRenderer.renderObject(gameObject);
     }
+
+    private void stopAllGameObjects(){
+        for (GameObject gameObject : m_listeners)
+            gameObject.exit();
+    }
+
 }

@@ -5,21 +5,22 @@ import com.Utility.Debug;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class InputManager {
     private static InputManager m_instance;
 
-    private final List<KeyEvent> m_inputList;
+    private final Queue<KeyEvent> m_inputList;
+
+    private int m_counter = 0;
 
     private InputManager() {
-        m_inputList = Collections.synchronizedList(new ArrayList<>());
+        m_inputList = new ConcurrentLinkedQueue<KeyEvent>();
         Main.getInstance().getStage().addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent e) -> {
-            if(!m_inputList.stream().anyMatch(x-> x.getCode().getCode() == e.getCode().getCode())){
-               m_inputList.add(e);
+            if (!m_inputList.stream().anyMatch(x -> x.getCode().getCode() == e.getCode().getCode())) {
+                m_inputList.add(e);
             }
         });
     }
@@ -31,14 +32,18 @@ public class InputManager {
         return m_instance;
     }
 
-    public void EndFrame(){
-        for(KeyEvent e : m_inputList)
-            Debug.Log("Key: " + e.getCode().getCode());
-        m_inputList.clear();
+    public void EndFrame() {
+        m_counter++;
+        if (m_counter / 5 == 0) {
+            for (KeyEvent k : m_inputList)
+                Debug.Log("Key clicked: " + k.getCode());
+            m_inputList.clear();
+            m_counter=0;
+        }
     }
 
-    public boolean isKeyPressed(KeyCode keyCode){
-        return m_inputList.stream().anyMatch(x-> x.getCode() == keyCode);
+    public boolean isKeyPressed(KeyCode keyCode) {
+        return m_inputList.stream().anyMatch(x -> x.getCode() == keyCode);
     }
 
 
