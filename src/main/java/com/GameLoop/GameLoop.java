@@ -5,7 +5,6 @@ import com.GameObjects.GameObject;
 import com.Utility.Debug;
 import javafx.scene.canvas.GraphicsContext;
 
-import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 

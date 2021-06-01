@@ -6,9 +6,13 @@ import com.GameObjects.Coin.Coin;
 import com.GameObjects.PacMan.PacMan;
 import com.Utility.GlobalReferenceManager;
 import com.Utility.Sprite;
+
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -17,6 +21,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class BoardController implements Initializable {
+
+    public StringProperty scoreText = new SimpleStringProperty();
+
     @FXML
     public Canvas mainCanvas;
     @FXML
@@ -27,6 +34,7 @@ public class BoardController implements Initializable {
 
     public BoardController() {
         m_gameBoard = new PredefinedBoard();
+        GlobalReferenceManager.boardController = this;
     }
 
     @Override
@@ -37,27 +45,33 @@ public class BoardController implements Initializable {
             m_mainGameLoop = GameLoop.getInstance();
             m_mainGameLoop.setBoard(m_gameBoard);
             setUpGame();
+
+            addVisuals();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void setUpGame() {
-        GlobalReferenceManager.pacMan = new PacMan(new Sprite(new Image("/icon.png"), 30, 30));
+    public void setScore(int score) {
+        scoreText.set("Score: " + score);
+    }
 
-        var x=0;
-        for(int[] i : m_gameBoard.BoardsPaths){
-            var y =0;
-            for(int j : i){
-                if(j == 1)
-                    {
-                        GlobalReferenceManager.Coins.add(new Coin(new Sprite(new Image("/coin.png"),30,30),y,x));
-                    }
+    private void setUpGame() {
+        var x = 0;
+        for (int[] i : m_gameBoard.BoardsPaths) {
+            var y = 0;
+            for (int j : i) {
+                if (j == 1) {
+                    GlobalReferenceManager.Coins.add(new Coin(new Sprite(new Image("/coin.png"), 20, 20), y, x));
+                }
                 y++;
             }
             x++;
         }
-        m_mainGameLoop.setGraphicContext(mainCanvas.getGraphicsContext2D(), mainCanvas.getWidth(), mainCanvas.getHeight());
+        GlobalReferenceManager.pacMan = new PacMan(new Sprite(new Image("/icon.png"), 30, 30));
+
+        m_mainGameLoop.setGraphicContext(mainCanvas.getGraphicsContext2D(), mainCanvas.getWidth(),
+                mainCanvas.getHeight());
         m_mainGameLoop.start();
     }
 
@@ -74,5 +88,11 @@ public class BoardController implements Initializable {
                 BoardGridPane.add(new ImageView(image), j, i);
             }
         }
+    }
+
+    private void addVisuals() {
+        Label lbl = new Label();
+        BoardGridPane.add((lbl), 0, 32, 12, 1);
+        lbl.textProperty().bind(scoreText);
     }
 }

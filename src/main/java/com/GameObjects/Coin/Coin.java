@@ -7,11 +7,12 @@ import com.Utility.Sprite;
 import com.Utility.Vector2;
 
 public class Coin extends GameObject {
+    private final float CoinTakeDistance = 10;
     private boolean taken = false;
 
     public Coin(Sprite sprite, int x, int y) {
         super(sprite);
-        m_position = new Vector2(30 * x, 30 * y);
+        m_position = new Vector2((30 * x)+5 , (30 * y)+5);
     }
 
     @Override
@@ -27,7 +28,6 @@ public class Coin extends GameObject {
             GameLoop.getInstance().removeListener(this);
             taken = true;
         }
-
     }
 
     @Override
@@ -39,8 +39,8 @@ public class Coin extends GameObject {
         float xDiff = position.x - m_position.x;
         float yDiff = position.y - m_position.y;
 
-        if (xDiff < 5 && xDiff > -5)
-            if (yDiff < 5 && yDiff > -5)
+        if (xDiff < CoinTakeDistance && xDiff > -CoinTakeDistance)
+            if (yDiff < CoinTakeDistance && yDiff > -CoinTakeDistance)
                 return true;
         return false;
     }

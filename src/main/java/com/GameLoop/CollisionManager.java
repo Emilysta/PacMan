@@ -1,6 +1,5 @@
 package com.GameLoop;
 
-import com.Utility.Debug;
 import com.Utility.MoveDirection;
 import com.Utility.Vector2;
 
