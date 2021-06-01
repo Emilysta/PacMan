@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="840.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.UI.BoardController">
+    <children>
+        <GridPane fx:id="BoardGridPane">
+            <columnConstraints>
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+                <ColumnConstraints minWidth="30.0" prefWidth="30.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+                <RowConstraints minHeight="30.0" prefHeight="30.0" />
+            </rowConstraints>
+        </GridPane>
+        <Canvas fx:id="mainCanvas" height="1080.0" width="840.0" GridPane.columnIndex="0" GridPane.columnSpan="28" GridPane.rowIndex="0" GridPane.rowSpan="36" />
+    </children>
+</StackPane>
