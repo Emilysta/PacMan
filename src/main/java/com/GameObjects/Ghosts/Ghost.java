@@ -14,6 +14,8 @@ public class Ghost extends GameObject {
     private GhostController m_ghostController;
     private GhostType m_ghostType;
     private final Thread m_controllerThread;
+    private final Thread m_controllerThread2;
+
 
     //private boolean m_isMoving = false;
     private MoveDirection m_moveDirection = MoveDirection.None;
@@ -24,10 +26,11 @@ public class Ghost extends GameObject {
         m_ghostModeController = new GhostModeController(this);
         m_controllerThread = new Thread(m_ghostModeController);
         m_position = new Vector2(90, 30);
-        homePosition = new Vector2(13*30,14*30);
+        homePosition = new Vector2(14*30,11*30);
         m_ghostType = ghostType;
         m_ghostController = new GhostController(m_ghostModeController,this);
-        m_ghostController.run();
+        m_controllerThread2 = new Thread(m_ghostController);
+
 
     }
 
@@ -35,11 +38,13 @@ public class Ghost extends GameObject {
     protected void onStart() {
         m_controllerThread.start();
         Debug.Log("Ghost started");
+        m_controllerThread2.start();
     }
 
     @Override
     protected void onUpdate() {
         m_moveDirection = m_ghostController.moveDirection;
+        Debug.Log("Update duszka: "+m_moveDirection);
         move();
     }
 
@@ -48,6 +53,8 @@ public class Ghost extends GameObject {
         if (m_controllerThread.isAlive()) {
             try {
                 m_ghostModeController.shouldThreadExit.set(true);
+                m_ghostController.shouldThreadExit.set(true);
+                m_controllerThread2.join();
                 m_controllerThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -69,7 +76,9 @@ public class Ghost extends GameObject {
                 m_position.x += 2;
             else if (m_moveDirection == MoveDirection.Left)
                 m_position.x -= 2;
+            //Debug.Log("Ruch:"+ m_moveDirection);
         } else
             m_moveDirection = MoveDirection.None;
+
     }
 }
