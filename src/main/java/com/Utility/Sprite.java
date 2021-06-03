@@ -2,6 +2,9 @@ package com.Utility;
 
 import javafx.scene.image.Image;
 
+/**
+ * Class represents an in-game sprite object to render
+ */
 public class Sprite {
     public Image spriteImage;
     public float width;

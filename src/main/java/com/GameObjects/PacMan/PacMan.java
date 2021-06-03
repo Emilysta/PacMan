@@ -7,39 +7,57 @@ import com.Utility.MoveDirection;
 import com.Utility.Sprite;
 import com.Utility.Vector2;
 
+/**
+ * Class represents the pac man in the game world
+ * Class extend the GameObject class to be included in the main gameLoop
+ */
 public class PacMan extends GameObject {
-    private final PacManController controller;
+    private final PacManController m_controller;
     private final Thread m_controllerThread;
 
     private boolean m_isMoving = false;
     private MoveDirection m_moveDirection = MoveDirection.None;
 
+    /**
+     * Creates a new pacman with the given sprite
+     * @param sprite - image to show pacman as
+     */
     public PacMan(Sprite sprite) {
         super(sprite);
-        controller = new PacManController();
-        m_controllerThread = new Thread(controller);
+        m_controller = new PacManController();
+        m_controllerThread = new Thread(m_controller);
         m_position = new Vector2(30, 30);
     }
 
+    /**
+     * Method starts the separate thread by which pacman is controlled
+     */
     @Override
     protected void onStart() {
         m_controllerThread.start();
         Debug.Log("Pacman started");
     }
 
+    /**
+     * Method check wheter user tried to change direction, if so it checks the
+     * possibility of that move and moves the pacman in the game world if possible
+     */
     @Override
     protected void onUpdate() {
-        if (controller.hasDirectionChanged.get())
-            tryMove(controller.moveDirection);
+        if (m_controller.hasDirectionChanged.get())
+            tryMove(m_controller.moveDirection);
         if (m_isMoving)
             move();
     }
 
+    /**
+     * Method stops the controller thread before exiting
+     */
     @Override
     protected void onExit() {
         if (m_controllerThread.isAlive()) {
             try {
-                controller.shouldThreadExit.set(true);
+                m_controller.shouldThreadExit.set(true);
                 m_controllerThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -47,11 +65,16 @@ public class PacMan extends GameObject {
         }
     }
 
+    /**
+     * Method checks wheter the move is possible 
+     * @param moveDirection - direction in which to try the move
+     * @return true if possible, false otherwise
+     */
     private boolean tryMove(MoveDirection moveDirection) {
         if (CollisionManager.checkIfMovePossible(m_position, moveDirection)) {
             m_isMoving = true;
             m_moveDirection = moveDirection;
-            controller.hasDirectionChanged.set(false);
+            m_controller.hasDirectionChanged.set(false);
             return true;
         } else {
             if (m_isMoving) {
@@ -73,6 +96,10 @@ public class PacMan extends GameObject {
         return false;
     }
 
+    /**
+     * Method moves pacman in the gameWorld according to it's current move
+     * direction. If move is illegal, it stops pacman in place.
+     */
     private void move() {
         if (CollisionManager.checkIfMovePossible(m_position, m_moveDirection)) {
             if (m_moveDirection == MoveDirection.Up)

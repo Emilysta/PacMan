@@ -63,6 +63,12 @@ public class GameLoop implements Runnable {
         if(m_isGamePlaying)
             gameObject.start();
     }
+    /**
+     * Method removes a gameObject from the gameLoop listeners, essentialy
+     * removing it from the game.
+     * @param gameObject - gameObject to remove from listeners and gameloop
+     * @return true if object was removed, false otherwise
+     */
 
     public boolean removeListener(GameObject gameObject){
         if (m_listeners.contains((gameObject))) {
@@ -103,7 +109,7 @@ public class GameLoop implements Runnable {
         int fps = 0;
         while (m_isGamePlaying) {
             long lastLoopTime = System.nanoTime();
-            playGameLoop(frameTime, lastLoopTime);
+            playOneFrame(frameTime, lastLoopTime);
             second += System.nanoTime() - lastLoopTime;
             fps += 1;
             if (second >= 1000000000) {
@@ -144,11 +150,17 @@ public class GameLoop implements Runnable {
         stopAllGameObjects();
     }
 
-    private void playGameLoop(long frameTime, long lastLoopTime) {
+    /**
+     * Method updates all gameObjects and renders them on screen according to
+     * their positions
+     * @param frameTime - time which one frame should take to complete
+     * @param lastLoopTime - time at which the last frame has ended
+     */
+    private void playOneFrame(long frameTime, long lastLoopTime) {
         while (System.nanoTime() < lastLoopTime + frameTime) ;
         updateAllGameObjects();
         renderGameObjects();
-        inputManager.EndFrame();
+        inputManager.endFrame();
     }
 
     private void startAllGameObjects() {

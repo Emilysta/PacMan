@@ -2,8 +2,17 @@ package com.GameLoop;
 
 import com.Utility.MoveDirection;
 import com.Utility.Vector2;
-
+/**
+ * CollisionManager class is responsible for checking whether a move is possible
+ * to complete. It doesn't need any local variables.
+ */
 public class CollisionManager {
+    /**
+     * Method checks if move is possible
+     * @param position - Vector2 of position on screen
+     * @param moveDirection - Move direction in which we check collision
+     * @return True if move is possible, false otherwise
+     */
     public static boolean checkIfMovePossible(Vector2 position, MoveDirection moveDirection) {
         int gridX = (int) position.x / 30;
         int gridY = (int) position.y / 30;

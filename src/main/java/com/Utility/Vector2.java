@@ -1,5 +1,7 @@
 package com.Utility;
-
+/**
+ * Class represents a two dimensional vector
+ */
 public class Vector2 {
     public float x;
     public float y;
