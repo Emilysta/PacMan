@@ -23,7 +23,6 @@ public class GhostModeController implements Runnable{
     @Override
     public void run() {
         while (true){
-
             if(shouldThreadExit.get())
                 return;
         }

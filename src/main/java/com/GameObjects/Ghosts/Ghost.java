@@ -16,23 +16,42 @@ public class Ghost extends GameObject {
     private final Thread m_controllerThread;
     private final Thread m_controllerThread2;
 
-
-    //private boolean m_isMoving = false;
     private MoveDirection m_moveDirection = MoveDirection.None;
     public Vector2 homePosition; //narazie jako wejście do ich domku
 
-    public Ghost(Sprite sprite,GhostType ghostType) {
+    public Ghost(Sprite sprite, GhostType ghostType) {
         super(sprite);
         m_ghostModeController = new GhostModeController(this);
         m_controllerThread = new Thread(m_ghostModeController);
         m_position = new Vector2(90, 30);
-        homePosition = new Vector2(14*30,11*30);
+        homePosition = new Vector2(14 * 30, 11 * 30);
         m_ghostType = ghostType;
-        m_ghostController = new GhostController(m_ghostModeController,this);
+
+        switch (ghostType) {
+            case Blinky: {
+                m_position = new Vector2(26*30,30);
+                m_ghostController = new BlinkyController(m_ghostModeController, this);
+                break;
+            }
+            case Inky: {
+                m_position=new Vector2(26*30,29*30);
+                m_ghostController = new InkyController(m_ghostModeController, this);
+                break;
+            }
+            case Clyde: {
+                m_position=new Vector2(30,29*30);
+                m_ghostController = new ClydeController(m_ghostModeController, this);
+                break;
+            }
+            case Pinky: {
+                m_position=new Vector2(90,30);
+                m_ghostController = new PinkyController(m_ghostModeController, this);
+                break;
+            }
+        }
         m_controllerThread2 = new Thread(m_ghostController);
-
-
     }
+
 
     @Override
     protected void onStart() {
@@ -44,13 +63,13 @@ public class Ghost extends GameObject {
     @Override
     protected void onUpdate() {
         m_moveDirection = m_ghostController.moveDirection;
-        Debug.Log("Update duszka: "+m_moveDirection);
+        //Debug.Log("Update duszka: " + m_moveDirection);
         move();
     }
 
     @Override
     protected void onExit() {
-        if (m_controllerThread.isAlive()) {
+        if (m_controllerThread.isAlive() || m_controllerThread2.isAlive()) {
             try {
                 m_ghostModeController.shouldThreadExit.set(true);
                 m_ghostController.shouldThreadExit.set(true);
@@ -76,9 +95,9 @@ public class Ghost extends GameObject {
                 m_position.x += 2;
             else if (m_moveDirection == MoveDirection.Left)
                 m_position.x -= 2;
-            //Debug.Log("Ruch:"+ m_moveDirection);
         } else
             m_moveDirection = MoveDirection.None;
 
     }
+
 }

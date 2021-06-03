@@ -71,7 +71,10 @@ public class BoardController implements Initializable {
             x++;
         }
         GlobalReferenceManager.pacMan = new PacMan(new Sprite(new Image("/icon.png"), 30, 30));
-        GlobalReferenceManager.ghost = new Ghost(new Sprite(new Image("/red.png"),30,30), GhostType.Blinky);
+        GlobalReferenceManager.blinky = new Ghost(new Sprite(new Image("/red.png"),30,30), GhostType.Blinky);
+        GlobalReferenceManager.inky = new Ghost(new Sprite(new Image("/blue.png"),30,30), GhostType.Inky);
+        GlobalReferenceManager.pinky = new Ghost(new Sprite(new Image("/pink.png"),30,30), GhostType.Pinky);
+        GlobalReferenceManager.clyde = new Ghost(new Sprite(new Image("/orange.png"),30,30), GhostType.Clyde);
         m_mainGameLoop.setGraphicContext(mainCanvas.getGraphicsContext2D(), mainCanvas.getWidth(),
                 mainCanvas.getHeight());
         m_mainGameLoop.start();

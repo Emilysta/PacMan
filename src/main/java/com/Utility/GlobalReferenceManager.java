@@ -14,7 +14,10 @@ import javafx.application.Platform;
  */
 public class GlobalReferenceManager {
     public static PacMan pacMan;
-    public static Ghost ghost;
+    public static Ghost pinky;
+    public static Ghost inky;
+    public static Ghost clyde;
+    public static Ghost blinky;
     public static Queue<Coin> Coins = new ConcurrentLinkedQueue<Coin>();
 
     public static BoardController boardController;

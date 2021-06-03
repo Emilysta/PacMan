@@ -157,10 +157,10 @@ public class GameLoop implements Runnable {
      * @param lastLoopTime - time at which the last frame has ended
      */
     private void playOneFrame(long frameTime, long lastLoopTime) {
-        while (System.nanoTime() < lastLoopTime + frameTime) ;
         updateAllGameObjects();
         renderGameObjects();
         inputManager.endFrame();
+        while (System.nanoTime() < lastLoopTime + frameTime) ;
     }
 
     private void startAllGameObjects() {

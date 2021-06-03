@@ -1,7 +1,6 @@
 package com.GameObjects.Ghosts;
 
 import com.GameLoop.GameLoop;
-import com.Utility.GlobalReferenceManager;
 import com.Utility.MoveDirection;
 import com.Utility.Vector2;
 
@@ -14,19 +13,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Klasa - rodzic - dla poszczególnych duchów, klasa działa jako osobny wątek i sprawdza ruchy duchów do wykonanania
  */
-public class GhostController implements Runnable {
+public abstract class GhostController implements Runnable {
     private GhostModeController m_ghostModeController;
     private GhostMode m_GhostMode;
     private Ghost m_ghost;
     public AtomicBoolean shouldThreadExit = new AtomicBoolean();
-    List<Vector2> steps;
+    private List<Vector2> m_steps;
     public MoveDirection moveDirection = MoveDirection.None;
-    //public AtomicBoolean hasDirectionChanged = new AtomicBoolean();
 
     public GhostController(GhostModeController ghostModeController, Ghost ghost) {
         m_ghostModeController = ghostModeController;
         m_ghost = ghost;
-        steps = new ArrayList<Vector2>();
+        m_steps = new ArrayList<Vector2>();
     }
 
     @Override
@@ -34,29 +32,29 @@ public class GhostController implements Runnable {
         while (true) {
             if (shouldThreadExit.get())
                 return;
-            //m_GhostMode = m_ghostModeController.ghostMode;
+            //m_GhostMode = m_ghostModeController.ghostMode; //toDo podmiana na to
             m_GhostMode = GhostMode.DeadMode;
             if (m_GhostMode != GhostMode.DeadMode) {
                 switch (m_GhostMode) {
                     case WanderingMode:
-                        //wanderingMode();
+                        wanderingMode();
                     case DistractMode:
-                        //chaseMode(); //toDo to check
+                        distractMode(); //toDo to check
                     case ChaseMode:
-                        //chaseMode();
+                        chaseMode();
                 }
             } else {
-                if (steps.size() == 0)
+                if (m_steps.size() == 0)
                     deadMode();
                 else {
-                    Vector2 positionToReach = steps.get(steps.size() - 1);
+                    Vector2 positionToReach = m_steps.get(m_steps.size() - 1);
                     Vector2 myPosition = new Vector2(m_ghost.getPosition().x,m_ghost.getPosition().y);
                     if (myPosition.x == positionToReach.x * 30 && myPosition.y == positionToReach.y * 30) {
-                        steps.remove(steps.size() - 1);
+                        m_steps.remove(m_steps.size() - 1);
                         moveDirection = MoveDirection.None;
                     }
-                    if (steps.size() != 0) {
-                        Vector2 move = steps.get(steps.size() - 1);
+                    if (m_steps.size() != 0) {
+                        Vector2 move = m_steps.get(m_steps.size() - 1);
                         myPosition.x = myPosition.x / 30;
                         myPosition.y = myPosition.y / 30;
                         if (myPosition.y != move.y) {
@@ -77,20 +75,19 @@ public class GhostController implements Runnable {
         }
     }
 
+    public abstract void chaseMode();
 
-    //public abstract void chaseMode();
+    public abstract void distractMode();
 
-    //public abstract void distractMode();
-
-    //public abstract void wanderingMode();
+    public abstract void wanderingMode();
 
     public void deadMode() {
-        steps = findPathToHome();
+        m_steps = findPathToHome();
     }
 
     static class queueNode {
-        Vector2 point; // The cordinates of a cell
-        int dist; // cell's distance of from the source
+        Vector2 point;
+        int dist;
 
         public queueNode(Vector2 point, int dist) {
             this.point = point;
