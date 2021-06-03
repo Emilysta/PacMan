@@ -4,6 +4,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.GameObjects.Coin.Coin;
+import com.GameObjects.Ghosts.Ghost;
 import com.GameObjects.PacMan.PacMan;
 import com.UI.BoardController;
 
@@ -13,6 +14,7 @@ import javafx.application.Platform;
  */
 public class GlobalReferenceManager {
     public static PacMan pacMan;
+    public static Ghost ghost;
     public static Queue<Coin> Coins = new ConcurrentLinkedQueue<Coin>();
 
     public static BoardController boardController;

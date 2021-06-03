@@ -10,12 +10,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * określa czy występuje tryb po zjedzeniu specjalnego pieniążka itp.
  */
 
-public class GhostController implements Runnable{
+public class GhostModeController implements Runnable{
 
     public GhostMode ghostMode = GhostMode.ChaseMode;
-    //public MoveDirection moveDirection = MoveDirection.None;
-    public AtomicBoolean hasDirectionChanged = new AtomicBoolean();
     public AtomicBoolean shouldThreadExit = new AtomicBoolean();
+    private Ghost m_ghost;
+
+    public GhostModeController(Ghost ghost){
+        m_ghost = ghost;
+    }
+
     @Override
     public void run() {
         while (true){
@@ -25,17 +29,21 @@ public class GhostController implements Runnable{
         }
     }
 
-    public void CheckMode()
+    public void checkMode()
     {
-        if(CollisionManager.checkIfCollisionWithPacMan(GlobalReferenceManager.pacMan.getPosition(),)) {
-            ghostMode = GhostMode.DeadMode;
-            return;
+        ghostMode = GhostMode.ChaseMode;
+        if(GlobalReferenceManager.pacMan.isPacmanPoweredUp())
+        {
+            ghostMode = GhostMode.WanderingMode;
         }
-        //if(GlobalReferenceManager.pacMan.ifAteSpecialCoin()){
-            //ghostMode = GhostMode.WanderingMode;
-        //}
-        //toDo mode chase and distract
-
+        if(CollisionManager.checkIfCollisionWithPacMan(m_ghost.getPosition())) {
+            if(GlobalReferenceManager.pacMan.isPacmanPoweredUp()){
+                ghostMode = GhostMode.DeadMode;
+            }
+            else{
+                //ToDo przegraj gre
+            }
+        }
+        //ToDo distract mode
     }
-
 }

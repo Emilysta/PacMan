@@ -16,6 +16,7 @@ public class PacMan extends GameObject {
     private final Thread m_controllerThread;
 
     private boolean m_isMoving = false;
+    private boolean m_isSuperPower = false;
     private MoveDirection m_moveDirection = MoveDirection.None;
 
     /**
@@ -27,6 +28,14 @@ public class PacMan extends GameObject {
         m_controller = new PacManController();
         m_controllerThread = new Thread(m_controller);
         m_position = new Vector2(30, 30);
+    }
+
+    /**
+     * Method checks whether pacman has eaten a special coin
+     * @return true if pacman is powered up, false otherwise
+     */
+    public boolean isPacmanPoweredUp(){
+        return m_isSuperPower;
     }
 
     /**

@@ -3,6 +3,8 @@ package com.UI;
 import com.Board.PredefinedBoard;
 import com.GameLoop.GameLoop;
 import com.GameObjects.Coin.Coin;
+import com.GameObjects.Ghosts.Ghost;
+import com.GameObjects.Ghosts.GhostType;
 import com.GameObjects.PacMan.PacMan;
 import com.Utility.GlobalReferenceManager;
 import com.Utility.Sprite;
@@ -69,7 +71,7 @@ public class BoardController implements Initializable {
             x++;
         }
         GlobalReferenceManager.pacMan = new PacMan(new Sprite(new Image("/icon.png"), 30, 30));
-
+        GlobalReferenceManager.ghost = new Ghost(new Sprite(new Image("/red.png"),30,30), GhostType.Blinky);
         m_mainGameLoop.setGraphicContext(mainCanvas.getGraphicsContext2D(), mainCanvas.getWidth(),
                 mainCanvas.getHeight());
         m_mainGameLoop.start();

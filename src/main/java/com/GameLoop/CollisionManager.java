@@ -1,7 +1,11 @@
 package com.GameLoop;
 
+import com.Utility.GlobalReferenceManager;
 import com.Utility.MoveDirection;
 import com.Utility.Vector2;
+
+import static java.lang.Math.abs;
+
 /**
  * CollisionManager class is responsible for checking whether a move is possible
  * to complete. It doesn't need any local variables.
@@ -44,6 +48,15 @@ public class CollisionManager {
             return position.y % 30 < 1;
         if (moveDirection == MoveDirection.Left && GameLoop.getInstance().gameBoard.BoardsPaths[gridY][gridX - 1] == 1)
             return position.y % 30 < 1;
+        return false;
+    }
+
+    public static boolean checkIfCollisionWithPacMan(Vector2 ghostPosition){
+        Vector2 pacmanPosition = GlobalReferenceManager.pacMan.getPosition();
+        float distanceX = abs(ghostPosition.x - pacmanPosition.x);
+        float distanceY = abs(ghostPosition.y - pacmanPosition.y);
+        if(distanceX < 5 && distanceY < 5)
+            return true;
         return false;
     }
 }
