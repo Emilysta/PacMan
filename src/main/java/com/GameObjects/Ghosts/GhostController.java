@@ -20,8 +20,9 @@ public abstract class GhostController implements Runnable {
     private GhostMode m_GhostMode;
     private Ghost m_ghost;
     public AtomicBoolean shouldThreadExit = new AtomicBoolean();
-    private List<Vector2> m_steps;
+    protected List<Vector2> m_steps;
     public MoveDirection moveDirection = MoveDirection.None;
+    private boolean isGoingHome = false;
 
     public GhostController(GhostModeController ghostModeController, Ghost ghost) {
         m_ghostModeController = ghostModeController;
@@ -31,13 +32,14 @@ public abstract class GhostController implements Runnable {
 
     @Override
     public void run() {
-        try{
-        while (true) {
-            if (shouldThreadExit.get())
-                return;
-            // m_GhostMode = m_ghostModeController.ghostMode; //toDo podmiana na to
-            m_GhostMode = GhostMode.DeadMode;
-            if (m_GhostMode != GhostMode.DeadMode) {
+        try {
+            while (true) {
+                if (shouldThreadExit.get())
+                    return;
+
+                //m_GhostMode = m_ghostModeController.ghostMode; //toDo podmiana na to
+                m_GhostMode = GhostMode.ChaseMode;
+
                 switch (m_GhostMode) {
                     case WanderingMode:
                         wanderingMode();
@@ -49,10 +51,14 @@ public abstract class GhostController implements Runnable {
                     case ChaseMode:
                         chaseMode();
                         break;
+                    case DeadMode:
+                        deadMode();
+                        break;
                 }
-            } else {
+
                 if (m_ghost.getPosition().equals(m_ghost.homePosition)) {
                     Debug.Log("Jestem w domku");
+                    isGoingHome = false;
                     moveDirection = MoveDirection.None;
                     try {
                         Thread.sleep(500);
@@ -60,7 +66,7 @@ public abstract class GhostController implements Runnable {
                         return;
                     }
                 } else if (m_steps.size() == 0)
-                    deadMode();
+                    ;//deadMode();
                 else {
                     Vector2 positionToReach = m_steps.get(m_steps.size() - 1);
                     Vector2 myPosition = new Vector2(m_ghost.getPosition().x, m_ghost.getPosition().y);
@@ -69,9 +75,11 @@ public abstract class GhostController implements Runnable {
                         moveDirection = MoveDirection.None;
                     }
                     if (m_steps.size() != 0) {
+
                         Vector2 move = m_steps.get(m_steps.size() - 1);
                         myPosition.x = myPosition.x / 30;
                         myPosition.y = myPosition.y / 30;
+
                         if (myPosition.y != move.y) {
                             if (myPosition.y < move.y)
                                 moveDirection = MoveDirection.Down;
@@ -86,9 +94,11 @@ public abstract class GhostController implements Runnable {
                         }
                     }
                 }
+
             }
         }
-        }catch(Exception e){
+        catch(Exception e){
+            e.printStackTrace();
             return;
         }
 }
@@ -100,7 +110,10 @@ public abstract class GhostController implements Runnable {
     public abstract void wanderingMode();
 
     public void deadMode() {
-        m_steps = findPathToHome();
+        if(!isGoingHome) {
+            m_steps = findPathToHome();
+            isGoingHome = true;
+        }
     }
 
     static class queueNode {
@@ -175,5 +188,64 @@ public abstract class GhostController implements Runnable {
             }
         }
         return null;
+    }
+
+    public List<Vector2> findPathToPoint(Vector2 point) {
+        Vector2 targetPosition = new Vector2((int)point.x/30, (int)point.y/30);
+        Vector2 myPosition = new Vector2((int)m_ghost.getPosition().x / 30, (int)m_ghost.getPosition().y / 30);
+        //Debug.LogError(myPosition + "->"+targetPosition);
+        if (targetPosition.equals(myPosition))
+            return new ArrayList<>();
+        int[][] boardsPaths = GameLoop.getInstance().gameBoard.BoardsPaths;
+        if (boardsPaths[(int) myPosition.y][(int) myPosition.x] != 1
+                || boardsPaths[(int) targetPosition.y][(int) targetPosition.x] != 1)
+            return new ArrayList<>();
+        boolean[][] visited = new boolean[31][28];
+        visited[(int) myPosition.y][(int) myPosition.x] = true;
+        Queue<queueNode> queue = new LinkedList<>();
+        queueNode start = new queueNode(myPosition, 0);
+        queue.add(start);
+        Vector2[] neighbourhood = { new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0) };
+        int[][] distances = new int[31][28];
+        while (!queue.isEmpty()) {
+            queueNode current = queue.remove();
+            Vector2 currentPoint = current.point;
+
+            if (currentPoint.x == targetPosition.x && currentPoint.y == targetPosition.y) {
+                List<Vector2> steps2 = new ArrayList<Vector2>();
+                steps2.add(targetPosition);
+                int x = (int) targetPosition.x;
+                int y = (int) targetPosition.y;
+                int tempDistance = current.dist - 1;
+                while (tempDistance != 0) {
+                    for (int k = 0; k < 4; k++) {
+                        int temp_x = x + (int) neighbourhood[k].x;
+                        int temp_y = y + (int) neighbourhood[k].y;
+                        if (distances[temp_y][temp_x] == tempDistance) {
+                            x = x + (int) neighbourhood[k].x;
+                            y = y + (int) neighbourhood[k].y;
+                            steps2.add(new Vector2(x, y));
+                            tempDistance--;
+                            break;
+                        }
+                    }
+                }
+                return steps2;
+            }
+
+            for (int i = 0; i < 4; i++) {
+                int row = (int) currentPoint.y + (int) neighbourhood[i].y;
+                int col = (int) currentPoint.x + (int) neighbourhood[i].x;
+
+                if (isCellInRange(row, col) && boardsPaths[row][col] == 1 && !visited[row][col]) {
+                    // mark cell as visited and enqueue it
+                    visited[row][col] = true;
+                    queueNode adjacentPoint = new queueNode(new Vector2(col, row), current.dist + 1);
+                    queue.add(adjacentPoint);
+                    distances[row][col] = current.dist + 1;
+                }
+            }
+        }
+        return new ArrayList<>();
     }
 }

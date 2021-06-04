@@ -32,6 +32,15 @@ public class PacMan extends GameObject {
     }
 
     /**
+     * Metoda pozwwalająca uzyskać kierunek ruchu PacMan'a
+     * @return kierunek ruchu PacMan'a
+     */
+    public MoveDirection getMoveDirection()
+    {
+        return m_moveDirection;
+    }
+
+    /**
      * Method checks whether pacman has eaten a special coin
      * @return true if pacman is powered up, false otherwise
      */
@@ -125,5 +134,7 @@ public class PacMan extends GameObject {
             m_moveDirection = MoveDirection.None;
         }
     }
+
+
 
 }

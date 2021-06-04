@@ -49,7 +49,7 @@ public class InputManager {
         m_counter++;
         if (m_counter / 5 == 0) {
             for (KeyEvent k : m_inputList)
-                Debug.Log("Key clicked: " + k.getCode());
+                //Debug.Log("Key clicked: " + k.getCode());
             m_inputList.clear();
             m_counter=0;
         }

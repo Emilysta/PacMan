@@ -37,7 +37,7 @@ public class GlobalReferenceManager {
      */
     public static void addScore(int value) {
         m_score += value;
-        Debug.LogWarning("dodano scorea:" + m_score);
+        //Debug.LogWarning("dodano scorea:" + m_score);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
