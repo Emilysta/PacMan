@@ -15,6 +15,7 @@ public class PacMan extends GameObject {
     private final PacManController m_controller;
     private final Thread m_controllerThread;
 
+    private float m_speed = 2;
     private boolean m_isMoving = false;
     private boolean m_isSuperPower = false;
     private MoveDirection m_moveDirection = MoveDirection.None;
@@ -112,13 +113,13 @@ public class PacMan extends GameObject {
     private void move() {
         if (CollisionManager.checkIfMovePossible(m_position, m_moveDirection)) {
             if (m_moveDirection == MoveDirection.Up)
-                m_position.y -= 2;
+                m_position.y -= m_speed;
             else if (m_moveDirection == MoveDirection.Down)
-                m_position.y += 2;
+                m_position.y += m_speed;
             else if (m_moveDirection == MoveDirection.Right)
-                m_position.x += 2;
+                m_position.x += m_speed;
             else if (m_moveDirection == MoveDirection.Left)
-                m_position.x -= 2;
+                m_position.x -= m_speed;
         } else {
             m_isMoving = false;
             m_moveDirection = MoveDirection.None;

@@ -46,4 +46,16 @@ public class GlobalReferenceManager {
             }
         });
     }
+    /**
+     * Clears all data from global reference manager
+     */
+    public static void clearData(){
+        pacMan=null;
+        pinky=null;
+        inky=null;
+        blinky=null;
+        clyde=null;
+        Coins=new ConcurrentLinkedQueue<Coin>();
+        m_score=0;
+    }
 }

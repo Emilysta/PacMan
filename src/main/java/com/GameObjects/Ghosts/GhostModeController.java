@@ -23,8 +23,14 @@ public class GhostModeController implements Runnable{
     @Override
     public void run() {
         while (true){
+            checkMode();
             if(shouldThreadExit.get())
                 return;
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                return;
+            }
         }
     }
 
@@ -40,7 +46,7 @@ public class GhostModeController implements Runnable{
                 ghostMode = GhostMode.DeadMode;
             }
             else{
-                //ToDo przegraj gre
+                GlobalReferenceManager.boardController.loseGame();
             }
         }
         //ToDo distract mode

@@ -24,7 +24,6 @@ public class GameLoop implements Runnable {
     private Thread m_mainThread;
     private boolean m_isGamePlaying = false;
     private final InputManager inputManager;
-
     private Renderer m_mainRenderer;
 
     private GameLoop() {
@@ -148,6 +147,14 @@ public class GameLoop implements Runnable {
             }
         }
         stopAllGameObjects();
+    }
+    /**
+     * Clears all data to prepare for new game
+     */
+    public void clearData(){
+        m_listeners.clear();
+        gameBoard = null;
+        m_mainRenderer = null;
     }
 
     /**

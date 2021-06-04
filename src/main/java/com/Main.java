@@ -1,6 +1,8 @@
 package com;
 
 import com.GameLoop.GameLoop;
+import com.UI.BoardController;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -122,16 +124,25 @@ public class Main extends Application {
 
     /**
      * Flexible method allowing to change current scene into one defined in
-     * <p>fxml<p> parameter.
-     * @param fxml - scene filename 
-     * @param width - scene width
+     * <p>
+     * fxml
+     * <p>
+     * parameter.
+     * 
+     * @param fxml   - scene filename
+     * @param width  - scene width
      * @param height - scene height
      * @throws Exception - if fxml is not found
      */
     private void replaceSceneContent(String fxml, double width, double height) throws Exception {
-        Parent page = FXMLLoader.load(getClass().getClassLoader().getResource(fxml));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(fxml));
+        Parent page = (Parent) loader.load();
         Scene scene = new Scene(page, width, height);
         m_mainStage.setScene(scene);
         m_mainStage.sizeToScene();
+        if (fxml.equals("Board.fxml")) {
+            var controller = (BoardController) loader.getController();
+            controller.initializeGame();
+        }
     }
 }

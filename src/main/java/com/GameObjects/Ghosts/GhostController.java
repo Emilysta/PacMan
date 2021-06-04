@@ -1,6 +1,7 @@
 package com.GameObjects.Ghosts;
 
 import com.GameLoop.GameLoop;
+import com.Utility.Debug;
 import com.Utility.MoveDirection;
 import com.Utility.Vector2;
 
@@ -11,7 +12,8 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Klasa - rodzic - dla poszczególnych duchów, klasa działa jako osobny wątek i sprawdza ruchy duchów do wykonanania
+ * Klasa - rodzic - dla poszczególnych duchów, klasa działa jako osobny wątek i
+ * sprawdza ruchy duchów do wykonanania
  */
 public abstract class GhostController implements Runnable {
     private GhostModeController m_ghostModeController;
@@ -29,26 +31,39 @@ public abstract class GhostController implements Runnable {
 
     @Override
     public void run() {
+        try{
         while (true) {
             if (shouldThreadExit.get())
                 return;
-            //m_GhostMode = m_ghostModeController.ghostMode; //toDo podmiana na to
+            // m_GhostMode = m_ghostModeController.ghostMode; //toDo podmiana na to
             m_GhostMode = GhostMode.DeadMode;
             if (m_GhostMode != GhostMode.DeadMode) {
                 switch (m_GhostMode) {
                     case WanderingMode:
                         wanderingMode();
+                        break;
                     case DistractMode:
-                        distractMode(); //toDo to check
+                        distractMode();
+                        break;
+                    // toDo to check
                     case ChaseMode:
                         chaseMode();
+                        break;
                 }
             } else {
-                if (m_steps.size() == 0)
+                if (m_ghost.getPosition().equals(m_ghost.homePosition)) {
+                    Debug.Log("Jestem w domku");
+                    moveDirection = MoveDirection.None;
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                } else if (m_steps.size() == 0)
                     deadMode();
                 else {
                     Vector2 positionToReach = m_steps.get(m_steps.size() - 1);
-                    Vector2 myPosition = new Vector2(m_ghost.getPosition().x,m_ghost.getPosition().y);
+                    Vector2 myPosition = new Vector2(m_ghost.getPosition().x, m_ghost.getPosition().y);
                     if (myPosition.x == positionToReach.x * 30 && myPosition.y == positionToReach.y * 30) {
                         m_steps.remove(m_steps.size() - 1);
                         moveDirection = MoveDirection.None;
@@ -73,7 +88,10 @@ public abstract class GhostController implements Runnable {
                 }
             }
         }
-    }
+        }catch(Exception e){
+            return;
+        }
+}
 
     public abstract void chaseMode();
 
@@ -95,8 +113,6 @@ public abstract class GhostController implements Runnable {
         }
     }
 
-    ;
-
     public boolean isCellInRange(int x, int y) {
         if ((x >= 0) && (x < 31) && (y >= 0) && (y < 28))
             return true;
@@ -106,16 +122,18 @@ public abstract class GhostController implements Runnable {
     public List<Vector2> findPathToHome() {
         Vector2 homePosition = new Vector2(m_ghost.homePosition.x / 30, m_ghost.homePosition.y / 30);
         Vector2 myPosition = new Vector2(m_ghost.getPosition().x / 30, m_ghost.getPosition().y / 30);
+        if (homePosition == myPosition)
+            return null;
         int[][] boardsPaths = GameLoop.getInstance().gameBoard.BoardsPaths;
-        if (boardsPaths[(int) myPosition.y][(int) myPosition.x] != 1 ||
-                boardsPaths[(int) homePosition.y][(int) homePosition.x] != 1)
+        if (boardsPaths[(int) myPosition.y][(int) myPosition.x] != 1
+                || boardsPaths[(int) homePosition.y][(int) homePosition.x] != 1)
             return null;
         boolean[][] visited = new boolean[31][28];
         visited[(int) myPosition.y][(int) myPosition.x] = true;
         Queue<queueNode> queue = new LinkedList<>();
         queueNode start = new queueNode(myPosition, 0);
         queue.add(start);
-        Vector2[] neighbourhood = {new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0)};
+        Vector2[] neighbourhood = { new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0) };
         int[][] distances = new int[31][28];
         while (!queue.isEmpty()) {
             queueNode current = queue.remove();
@@ -132,9 +150,9 @@ public abstract class GhostController implements Runnable {
                         int temp_x = x + (int) neighbourhood[k].x;
                         int temp_y = y + (int) neighbourhood[k].y;
                         if (distances[temp_y][temp_x] == tempDistance) {
-                            x = x + (int)neighbourhood[k].x;
-                            y = y + (int)neighbourhood[k].y;
-                            steps2.add(new Vector2(x,y));
+                            x = x + (int) neighbourhood[k].x;
+                            y = y + (int) neighbourhood[k].y;
+                            steps2.add(new Vector2(x, y));
                             tempDistance--;
                             break;
                         }
@@ -147,14 +165,10 @@ public abstract class GhostController implements Runnable {
                 int row = (int) currentPoint.y + (int) neighbourhood[i].y;
                 int col = (int) currentPoint.x + (int) neighbourhood[i].x;
 
-                if (isCellInRange(row, col) &&
-                        boardsPaths[row][col] == 1 &&
-                        !visited[row][col]) {
+                if (isCellInRange(row, col) && boardsPaths[row][col] == 1 && !visited[row][col]) {
                     // mark cell as visited and enqueue it
                     visited[row][col] = true;
-                    queueNode adjacentPoint = new queueNode
-                            (new Vector2(col,row),
-                                    current.dist + 1);
+                    queueNode adjacentPoint = new queueNode(new Vector2(col, row), current.dist + 1);
                     queue.add(adjacentPoint);
                     distances[row][col] = current.dist + 1;
                 }

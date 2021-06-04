@@ -73,10 +73,17 @@ public class Ghost extends GameObject {
             try {
                 m_ghostModeController.shouldThreadExit.set(true);
                 m_ghostController.shouldThreadExit.set(true);
-                m_controllerThread2.join();
+                m_controllerThread.interrupt();
+                m_controllerThread2.interrupt();
                 m_controllerThread.join();
+                Debug.Log("Mode controller dead");
+                m_controllerThread2.join();
+                Debug.Log("Chodzenie controller dead");
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                m_ghostModeController.shouldThreadExit.set(true);
+                m_ghostController.shouldThreadExit.set(true);
+                m_controllerThread.interrupt();
+                m_controllerThread2.interrupt();
             }
         }
     }
