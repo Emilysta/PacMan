@@ -24,7 +24,7 @@ public class Ghost extends GameObject {
         m_ghostModeController = new GhostModeController(this);
         m_controllerThread = new Thread(m_ghostModeController);
         m_position = new Vector2(90, 30);
-        homePosition = new Vector2(14 * 30, 11 * 30);
+        homePosition = new Vector2(14, 11);
         m_ghostType = ghostType;
 
         switch (ghostType) {
@@ -44,7 +44,7 @@ public class Ghost extends GameObject {
                 break;
             }
             case Pinky: {
-                m_position=new Vector2(90,30);
+                m_position=new Vector2(120,30);
                 m_ghostController = new PinkyController(m_ghostModeController, this);
                 break;
             }
@@ -56,7 +56,7 @@ public class Ghost extends GameObject {
     @Override
     protected void onStart() {
         m_controllerThread.start();
-        Debug.Log("Ghost started");
+        Debug.Log(m_ghostType + " ghost started");
         m_controllerThread2.start();
     }
 
@@ -76,9 +76,9 @@ public class Ghost extends GameObject {
                 m_controllerThread.interrupt();
                 m_controllerThread2.interrupt();
                 m_controllerThread.join();
-                Debug.Log("Mode controller dead");
+                Debug.Log(m_ghostType+" mode controller dead");
                 m_controllerThread2.join();
-                Debug.Log("Chodzenie controller dead");
+                Debug.Log(m_ghostType + " controller dead");
             } catch (InterruptedException e) {
                 m_ghostModeController.shouldThreadExit.set(true);
                 m_ghostController.shouldThreadExit.set(true);

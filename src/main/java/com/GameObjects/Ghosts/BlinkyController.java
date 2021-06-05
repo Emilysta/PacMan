@@ -21,7 +21,8 @@ public class BlinkyController extends GhostController{
         if(System.nanoTime() - m_lastUpdate > 1000000000) {
             m_steps.clear();
             moveDirection= MoveDirection.None;
-            m_steps = findPathToPoint(GlobalReferenceManager.pacMan.getPosition());
+            Vector2 pacmanPosition = new Vector2(GlobalReferenceManager.pacMan.getPosition().x/30,GlobalReferenceManager.pacMan.getPosition().y/30);
+            m_steps = findPathToPoint(pacmanPosition);
             m_lastUpdate =System.nanoTime();
         }
     }

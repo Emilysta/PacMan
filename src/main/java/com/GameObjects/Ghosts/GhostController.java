@@ -2,6 +2,7 @@ package com.GameObjects.Ghosts;
 
 import com.GameLoop.GameLoop;
 import com.Utility.Debug;
+import com.Utility.GlobalReferenceManager;
 import com.Utility.MoveDirection;
 import com.Utility.Vector2;
 
@@ -133,7 +134,7 @@ public abstract class GhostController implements Runnable {
     }
 
     public List<Vector2> findPathToHome() {
-        Vector2 homePosition = new Vector2(m_ghost.homePosition.x / 30, m_ghost.homePosition.y / 30);
+        Vector2 homePosition = new Vector2(m_ghost.homePosition.x, m_ghost.homePosition.y);
         Vector2 myPosition = new Vector2(m_ghost.getPosition().x / 30, m_ghost.getPosition().y / 30);
         if (homePosition == myPosition)
             return null;
@@ -191,7 +192,7 @@ public abstract class GhostController implements Runnable {
     }
 
     public List<Vector2> findPathToPoint(Vector2 point) {
-        Vector2 targetPosition = new Vector2((int)point.x/30, (int)point.y/30);
+        Vector2 targetPosition = new Vector2((int)point.x, (int)point.y);
         Vector2 myPosition = new Vector2((int)m_ghost.getPosition().x / 30, (int)m_ghost.getPosition().y / 30);
         //Debug.LogError(myPosition + "->"+targetPosition);
         if (targetPosition.equals(myPosition))
@@ -247,5 +248,49 @@ public abstract class GhostController implements Runnable {
             }
         }
         return new ArrayList<>();
+    }
+
+    protected Vector2 find2DotsTowardsPacMan() {
+        Vector2 targetPoint = new Vector2();
+        MoveDirection pacManMoveDirection = GlobalReferenceManager.pacMan.getMoveDirection();
+        Vector2 pacManPosition = new Vector2((int) GlobalReferenceManager.pacMan.getPosition().x / 30, (int) GlobalReferenceManager.pacMan.getPosition().y / 30);
+
+        int[][] board = GameLoop.getInstance().gameBoard.BoardsPaths;
+        Vector2 moveDirectionInBoard = new Vector2();
+        switch (pacManMoveDirection) {
+            case Up: {
+                moveDirectionInBoard = new Vector2(0, -1);
+            }
+            case Down: {
+                moveDirectionInBoard = new Vector2(0, 1);
+            }
+            case Left: {
+                moveDirectionInBoard = new Vector2(-1, 0);
+            }
+            case Right: {
+                moveDirectionInBoard = new Vector2(1, 0);
+            }
+            case None: {
+                moveDirectionInBoard = new Vector2(0, 0);
+            }
+        }
+        int positionToMoveX2 = (int) (pacManPosition.y + moveDirectionInBoard.y * 2);
+        int positionToMoveY2 = (int) (pacManPosition.x + moveDirectionInBoard.x * 2);
+        int positionToMoveX = (int) (pacManPosition.y + moveDirectionInBoard.y);
+        int positionToMoveY = (int) (pacManPosition.x + moveDirectionInBoard.x);
+
+        boolean is2InRange = isCellInRange(positionToMoveX2, positionToMoveY2);
+        boolean isInRange = isCellInRange(positionToMoveX, positionToMoveY);
+        targetPoint = pacManPosition;
+        if (isInRange) {
+            if (board[positionToMoveX][positionToMoveY] == 1)
+                targetPoint = new Vector2(positionToMoveY, positionToMoveX);
+        }
+        if (is2InRange) {
+            if (board[positionToMoveX2][positionToMoveY2] == 1)
+                targetPoint = new Vector2(positionToMoveY, positionToMoveX);
+        }
+        //Debug.Log("Pinky target x: "+targetPoint.x + "y: "+targetPoint.y);
+        return targetPoint;
     }
 }
