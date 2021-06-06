@@ -11,26 +11,37 @@ import com.GameObjects.PacMan.PacMan;
 import com.Utility.GlobalReferenceManager;
 import com.Utility.Sprite;
 
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 public class BoardController {
 
     public StringProperty scoreText = new SimpleStringProperty();
-
+    public Region blendCanvas = new Region();
     @FXML
     public Canvas mainCanvas;
     @FXML
     private GridPane BoardGridPane;
+    @FXML
+    private Button tryAgainButton;
+    @FXML
+    private Button goToMainWindowButton;
 
     private GameLoop m_mainGameLoop;
     private PredefinedBoard m_gameBoard;
@@ -46,8 +57,25 @@ public class BoardController {
             m_mainGameLoop.clearData();
             m_mainGameLoop.setBoard(m_gameBoard);
             setUpGame();
-
             addVisuals();
+            //blendCanvas.setVisible(false);
+            blendCanvas.setStyle("-fx-background-color: rgba(1,0,0,0.2)");
+            blendCanvas.toFront();
+            goToMainWindowButton.setVisible(false);
+            tryAgainButton.setVisible(false);
+            tryAgainButton.toFront();
+            goToMainWindowButton.toFront();
+            //Platform.runLater(()->blendCanvas.getGraphicsContext2D().setFill(Color.color(0,0,0,1)));
+            blendCanvas.setMouseTransparent(true);
+            tryAgainButton.setOnAction(e -> {
+                tryAgainButton.setDisable(true);
+                goToMainWindowButton.setDisable(true);
+                tryAgainButton.setVisible(false);
+                goToMainWindowButton.setVisible(false);
+                blendCanvas.setVisible(false);
+                initializeGame();
+            });
+            goToMainWindowButton.setOnAction((event) -> Main.getInstance().goToMainWindow());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,17 +89,11 @@ public class BoardController {
         m_mainGameLoop.stop();
         Platform.runLater(() -> {
             mainCanvas.setMouseTransparent(true);
-            Button btn = new Button("Try again!");
-            Button btn2 = new Button("Go back to main menu");
-            BoardGridPane.add(btn, 12, 6, 12, 4);
-            BoardGridPane.add(btn2, 12, 12, 12, 4);
-
-            btn.setOnAction((event) ->{
-                initializeGame();
-                BoardGridPane.getChildren().remove(btn2);
-                BoardGridPane.getChildren().remove(btn);
-            } );
-            btn2.setOnAction((event) -> Main.getInstance().goToMainWindow());
+            goToMainWindowButton.setVisible(true);
+            tryAgainButton.setVisible(true);
+            goToMainWindowButton.setDisable(false);
+            tryAgainButton.setDisable(false);
+            blendCanvas.setVisible(true);
         });
     }
 
@@ -107,7 +129,7 @@ public class BoardController {
         String filePath = "file:TERRAIN/";
         for (int i = 0; i < m_gameBoard.BoardPathTypes.length; i++) {
             for (int j = 0; j < m_gameBoard.BoardPathTypes[i].length; j++) {
-                if(m_gameBoard.BoardPathTypes[i][j]!= PathTypes.EMPTY) {
+                if (m_gameBoard.BoardPathTypes[i][j] != PathTypes.EMPTY) {
                     String fileName = filePath + m_gameBoard.BoardPathTypes[i][j] + ".png";
                     Image image = new Image(fileName, 30, 30, true, true);
                     BoardGridPane.add(new ImageView(image), j, i);
