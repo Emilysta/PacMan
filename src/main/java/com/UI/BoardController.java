@@ -66,6 +66,11 @@ public class BoardController {
             BoardGridPane.add(btn, 12, 6, 12, 4);
             BoardGridPane.add(btn2, 12, 12, 12, 4);
 
+            btn.setOnAction((event) ->{
+                initializeGame();
+                BoardGridPane.getChildren().remove(btn2);
+                BoardGridPane.getChildren().remove(btn);
+            } );
             btn2.setOnAction((event) -> Main.getInstance().goToMainWindow());
         });
     }

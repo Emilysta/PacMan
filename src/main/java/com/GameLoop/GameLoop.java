@@ -124,6 +124,7 @@ public class GameLoop implements Runnable {
      * Use this over run() to run on separate thread.
      */
     public void start() {
+        stop();
         if (m_mainThread == null) {
             m_mainThread = new Thread(GameLoop.getInstance());
             m_mainThread.start();
@@ -147,6 +148,7 @@ public class GameLoop implements Runnable {
             }
         }
         stopAllGameObjects();
+        m_mainThread=null;
     }
     /**
      * Clears all data to prepare for new game
