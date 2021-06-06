@@ -36,9 +36,9 @@ public class InkyController extends GhostController {
             if (boards[(int) positionToMove.y][(int) positionToMove.x] != 1) {
                 positionToMove = lookAtNeighbourhood(positionToMove);
             }
-            Debug.Log("Inky x:" + positionToMove.x + " y:" + positionToMove.y);
+            //Debug.Log("Inky x:" + positionToMove.x + " y:" + positionToMove.y);
             m_steps = findPathToPoint(positionToMove);
-            Debug.Log("Inky size: "+m_steps.size());
+            //Debug.Log("Inky size: "+m_steps.size());
             m_lastUpdate = System.nanoTime();
         }
     }

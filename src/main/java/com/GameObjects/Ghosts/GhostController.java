@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class GhostController implements Runnable {
     private GhostModeController m_ghostModeController;
     private GhostMode m_GhostMode;
-    private Ghost m_ghost;
+    protected Ghost m_ghost;
     public AtomicBoolean shouldThreadExit = new AtomicBoolean();
     protected List<Vector2> m_steps;
     public MoveDirection moveDirection = MoveDirection.None;

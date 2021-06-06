@@ -1,8 +1,12 @@
 package com.Board;
 
+import com.Utility.Vector2;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Klasa pozwalająca wczytać predefiniowane plansze do gry
@@ -24,6 +28,11 @@ public class PredefinedBoard {
      * Zawiera komórki typu: RoadTypes.
      */
     public PathTypes[][] BoardPathTypes = new PathTypes[31][28];
+
+    /**
+     * Lista indeksów miejsc, w któych tablica BoardPaths zawiera jedynki
+     */
+    public List<Vector2> onesList = new ArrayList<Vector2>();
 
     /**
      * Metoda losująca nazwę pliku zawierającego wygląd planszy
@@ -69,6 +78,7 @@ public class PredefinedBoard {
         //System.out.print(BoardsPaths);
         makeUpBoardTileArray();
         setPathTypes();
+        setUpListOfOnes();
     }
 
     /**
@@ -183,4 +193,18 @@ public class PredefinedBoard {
             }
         }
     }
+
+
+    /**
+     * Metoda uzupełniaąca listę wystepowania "jedynek" na mapie
+     */
+    private void setUpListOfOnes(){
+        for(int i = 0; i<31;i++){
+            for(int j =0;j<28;j++){
+                if(BoardsPaths[i][j]==1)
+                    onesList.add(new Vector2(i,j));
+            }
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.UI;
 
+import com.Board.PathTypes;
 import com.Main;
 import com.Board.PredefinedBoard;
 import com.GameLoop.GameLoop;
@@ -96,12 +97,15 @@ public class BoardController {
     }
 
     private void openBoard() throws Exception {
+        BoardGridPane.setStyle("-fx-background-color: #000000;");
         String filePath = "file:TERRAIN/";
         for (int i = 0; i < m_gameBoard.BoardPathTypes.length; i++) {
             for (int j = 0; j < m_gameBoard.BoardPathTypes[i].length; j++) {
-                String fileName = filePath + m_gameBoard.BoardPathTypes[i][j] + ".png";
-                Image image = new Image(fileName, 30, 30, true, true);
-                BoardGridPane.add(new ImageView(image), j, i);
+                if(m_gameBoard.BoardPathTypes[i][j]!= PathTypes.EMPTY) {
+                    String fileName = filePath + m_gameBoard.BoardPathTypes[i][j] + ".png";
+                    Image image = new Image(fileName, 30, 30, true, true);
+                    BoardGridPane.add(new ImageView(image), j, i);
+                }
             }
         }
     }
