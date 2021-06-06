@@ -32,9 +32,4 @@ public class BlinkyController extends GhostController{
             m_steps = findPathToPoint(m_startPoint);
 
     }
-
-    @Override
-    public void wanderingMode() {
-
-    }
 }

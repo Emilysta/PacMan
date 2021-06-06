@@ -65,6 +65,7 @@ public class BoardController {
             Button btn2 = new Button("Go back to main menu");
             BoardGridPane.add(btn, 12, 6, 12, 4);
             BoardGridPane.add(btn2, 12, 12, 12, 4);
+
             btn2.setOnAction((event) -> Main.getInstance().goToMainWindow());
         });
     }

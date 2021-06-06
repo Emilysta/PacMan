@@ -35,12 +35,4 @@ public class PinkyController extends GhostController {
     public void distractMode() {
 
     }
-
-    @Override
-    public void wanderingMode() {
-
-    }
-
-
-
 }

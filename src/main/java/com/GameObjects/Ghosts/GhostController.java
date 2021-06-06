@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -17,13 +18,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * sprawdza ruchy duchów do wykonanania
  */
 public abstract class GhostController implements Runnable {
+    private int randMin = 4;
+    private int randMax = 6;
     private GhostModeController m_ghostModeController;
     private GhostMode m_GhostMode;
-    protected Ghost m_ghost;
-    public AtomicBoolean shouldThreadExit = new AtomicBoolean();
-    protected List<Vector2> m_steps;
-    public MoveDirection moveDirection = MoveDirection.None;
     private boolean isGoingHome = false;
+    protected long m_lastUpdate;
+    protected Ghost m_ghost;
+    protected List<Vector2> m_steps;
+    public AtomicBoolean shouldThreadExit = new AtomicBoolean();
+    public MoveDirection moveDirection = MoveDirection.None;
 
     public GhostController(GhostModeController ghostModeController, Ghost ghost) {
         m_ghostModeController = ghostModeController;
@@ -37,7 +41,6 @@ public abstract class GhostController implements Runnable {
             while (true) {
                 if (shouldThreadExit.get())
                     return;
-
                 //m_GhostMode = m_ghostModeController.ghostMode; //toDo podmiana na to
                 m_GhostMode = GhostMode.ChaseMode;
 
@@ -108,7 +111,17 @@ public abstract class GhostController implements Runnable {
 
     public abstract void distractMode();
 
-    public abstract void wanderingMode();
+    public void wanderingMode(){
+        if(shouldThreadExit.get())
+            return;
+        if (System.nanoTime() - m_lastUpdate > 1000000000) {
+            m_steps.clear();
+            moveDirection = MoveDirection.None;
+            Vector2 randomPoint = randPointInRange();
+            m_steps = findPathToPoint(randomPoint);
+            m_lastUpdate = System.nanoTime();
+        }
+    }
 
     public void deadMode() {
         if(!isGoingHome) {
@@ -219,6 +232,8 @@ public abstract class GhostController implements Runnable {
                 int y = (int) targetPosition.y;
                 int tempDistance = current.dist - 1;
                 while (tempDistance != 0) {
+                    if(shouldThreadExit.get())
+                        return null;
                     for (int k = 0; k < 4; k++) {
                         int temp_x = x + (int) neighbourhood[k].x;
                         int temp_y = y + (int) neighbourhood[k].y;
@@ -292,5 +307,30 @@ public abstract class GhostController implements Runnable {
         }
         //Debug.Log("Pinky target x: "+targetPoint.x + "y: "+targetPoint.y);
         return targetPoint;
+    }
+    protected Vector2 randPointInRange(){
+        Vector2 newPoint =  new Vector2();
+        Vector2 myPosition = new Vector2((int)m_ghost.getPosition().x/30,(int)m_ghost.getPosition().y/30);
+        int myPositionX = (int)myPosition.y;
+        int myPositionY = (int)myPosition.x;
+        int board[][] = GameLoop.getInstance().gameBoard.BoardsPaths;
+        //(x-a)^2 + (y-b)^2 = r^2 gdzie (a,b) to środek - pozycja ducha i r to promień
+        List<Vector2> localOnes = GameLoop.getInstance().gameBoard.onesList;
+        int sizeOfOnesList = localOnes.size();
+        int index = ThreadLocalRandom.current().nextInt(0, sizeOfOnesList);
+        int x = (int)localOnes.get(index).x;
+        int y = (int)localOnes.get(index).y;
+        while(((Math.pow(x - myPositionX,2)+Math.pow(y - myPositionY,2))>=Math.pow(randMax,2)) &&
+                ((Math.pow(x - myPositionX,2)+Math.pow(y - myPositionY,2))<=Math.pow(randMin,2)) && x==myPositionX && y==myPositionY ){
+            if(shouldThreadExit.get())
+                return null;
+            index = ThreadLocalRandom.current().nextInt(0, sizeOfOnesList);
+            x = (int)localOnes.get(index).x;
+            y = (int)localOnes.get(index).y;
+        }
+        newPoint.x = y;
+        newPoint.y = x;
+
+        return newPoint;
     }
 }

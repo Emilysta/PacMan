@@ -22,6 +22,8 @@ public class InkyController extends GhostController {
 
     @Override
     public void chaseMode() {
+        if(shouldThreadExit.get())
+            return;
         if (System.nanoTime() - m_lastUpdate > 1000000000) {
             m_steps.clear();
             moveDirection = MoveDirection.None;
@@ -48,15 +50,12 @@ public class InkyController extends GhostController {
 
     }
 
-    @Override
-    public void wanderingMode() {
-
-    }
-
     private Vector2 findNearestInRange(Vector2 startPoint) {
         Vector2 nearestInRange = new Vector2();
         Vector2 point = new Vector2(startPoint.x, startPoint.y);
         while (!isCellInRange((int) point.y, (int) point.x)) {
+            if(shouldThreadExit.get())
+                return null;
             if (0 <= point.y && point.y < 31) {
                 nearestInRange.y = point.y;
             } else {
@@ -84,6 +83,8 @@ public class InkyController extends GhostController {
         BoardTile ngbhOfPoints[][] = GameLoop.getInstance().gameBoard.Board;
         NeighbourhoodType ngbhType = NeighbourhoodType.None;
         while (!isOneInNeighbourhood(ngbhOfPoints[(int) point.y][(int) point.x], ngbhType)) {
+            if(shouldThreadExit.get())
+                return null;
             if(isCellInRange((int)point.y,(int)point.x+1)) {
                 point.x = point.x + 1;
             }

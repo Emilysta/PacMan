@@ -84,6 +84,9 @@ public class Ghost extends GameObject {
                 m_ghostController.shouldThreadExit.set(true);
                 m_controllerThread.interrupt();
                 m_controllerThread2.interrupt();
+                Debug.Log(m_ghostType+" mode controller interrupted");
+                Debug.Log(m_ghostType + " controller interrupted");
+
             }
         }
     }
