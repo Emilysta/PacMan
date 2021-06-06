@@ -86,7 +86,6 @@ public class Ghost extends GameObject {
                 m_controllerThread2.interrupt();
                 Debug.Log(m_ghostType+" mode controller interrupted");
                 Debug.Log(m_ghostType + " controller interrupted");
-
             }
         }
     }

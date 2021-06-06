@@ -67,7 +67,7 @@ public abstract class GhostController implements Runnable {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
-                        return;
+                        shouldThreadExit.set(true);
                     }
                 } else if (m_steps.size() == 0)
                     ;//deadMode();
@@ -101,9 +101,10 @@ public abstract class GhostController implements Runnable {
 
             }
         }
+
+        
         catch(Exception e){
             e.printStackTrace();
-            return;
         }
 }
 
