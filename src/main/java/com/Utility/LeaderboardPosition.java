@@ -11,9 +11,6 @@ public class LeaderboardPosition implements Serializable {
 
     @Override
     public String toString() {
-        return "LeaderboardPosition{" +
-                "Score=" + Score +
-                ", Name=" + Name +
-                '}';
+        return Name + " : " +Score +" points";
     }
 }
