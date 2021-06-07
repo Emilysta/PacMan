@@ -12,20 +12,20 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Klasa - rodzic - dla poszczególnych duchów, klasa działa jako osobny wątek i
- * sprawdza ruchy duchów do wykonania
+ * Klasa bazowa dla kontrolerów poszczególnych duchów, klasa działa jako osobny wątek i
+ * sprawdza ruchy do wykonania
  */
 public abstract class GhostController implements Runnable {
+    public AtomicBoolean shouldThreadExit = new AtomicBoolean();
+    public MoveDirection moveDirection = MoveDirection.None;
+    protected long m_lastUpdate;
+    protected Ghost m_ghost;
+    protected List<Vector2> m_steps;
     private int randMin = 4;
     private int randMax = 6;
     private GhostModeController m_ghostModeController;
     private GhostMode m_GhostMode;
     private boolean isGoingHome = false;
-    protected long m_lastUpdate;
-    protected Ghost m_ghost;
-    protected List<Vector2> m_steps;
-    public AtomicBoolean shouldThreadExit = new AtomicBoolean();
-    public MoveDirection moveDirection = MoveDirection.None;
 
 
     public GhostController(GhostModeController ghostModeController, Ghost ghost) {
@@ -34,6 +34,12 @@ public abstract class GhostController implements Runnable {
         m_steps = new ArrayList<Vector2>();
     }
 
+    /**
+     * Metoda wywoływana wraz z uruchomieniem wątku, metoda sprawdza,
+     * w jakim trybie znajdyje się duch i w zależności od tego
+     * wywyołuje odpowiednią metodę znajdującą ścieżkę.
+     * Dodatkowo w zależności od trybu ustawia odpowiednie zdjęcie do renderowania dla odpowiedniego ducha
+     */
     @Override
     public void run() {
         try {
@@ -43,14 +49,18 @@ public abstract class GhostController implements Runnable {
                 //m_GhostMode = m_ghostModeController.ghostMode; //toDo podmiana na to
                 m_GhostMode = GhostMode.ChaseMode;
                 String whichGhost = "";
-                switch(m_ghost.m_ghostType) {
-                    case Blinky: whichGhost = "/red.png";
+                switch (m_ghost.m_ghostType) {
+                    case Blinky:
+                        whichGhost = "/red.png";
                         break;
-                    case Inky: whichGhost = "/blue.png";
+                    case Inky:
+                        whichGhost = "/blue.png";
                         break;
-                    case Clyde: whichGhost ="/orange.png";
+                    case Clyde:
+                        whichGhost = "/orange.png";
                         break;
-                    case Pinky: whichGhost = "/pink.png";
+                    case Pinky:
+                        whichGhost = "/pink.png";
                 }
                 switch (m_GhostMode) {
                     case WanderingMode: {
@@ -116,20 +126,24 @@ public abstract class GhostController implements Runnable {
                 }
 
             }
-        }
-
-        
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-}
+    }
 
+    /**
+     * Metoda do nadpisania w klasach dziedziczących, metoda wywoływana w momencie gdy duch jest w trybie Chase.
+     */
     public abstract void chaseMode();
-
+    /**
+     * Metoda do nadpisania w klasach dziedziczących, metoda wywoływana w momencie gdy duch jest w trybie Scatter.
+     */
     public abstract void distractMode();
-
-    public void wanderingMode(){
-        if(shouldThreadExit.get())
+    /**
+     * Metoda określająca ruchy ducha w trybie wędrowania - gdy Pac-Man jest w trybie Power-Up.
+     */
+    public void wanderingMode() {
+        if (shouldThreadExit.get())
             return;
         if (System.nanoTime() - m_lastUpdate > 1000000000) {
             m_steps.clear();
@@ -139,91 +153,31 @@ public abstract class GhostController implements Runnable {
             m_lastUpdate = System.nanoTime();
         }
     }
-
+    /**
+     * Metoda określająca ruchy ducha, gdy umarł, wyszukuje najkrótszą ścieżkę do domu.
+     */
     public void deadMode() {
-        if(!isGoingHome) {
-            m_steps = findPathToHome();
+        if (!isGoingHome) {
+            m_steps = findPathToPoint(m_ghost.homePosition);
             isGoingHome = true;
         }
     }
-
-    static class queueNode {
-        Vector2 point;
-        int dist;
-
-        public queueNode(Vector2 point, int dist) {
-            this.point = point;
-            this.dist = dist;
-        }
-    }
-
+    /**
+     * Metoda określająca czy wartości x i y zawierają się w rozmiarze planszy
+     * @return true - jeśli wartości są w zakresie, false w przeciwnym razie
+     */
     public boolean isCellInRange(int x, int y) {
         if ((x >= 0) && (x < 31) && (y >= 0) && (y < 28))
             return true;
         return false;
     }
-
-    public List<Vector2> findPathToHome() {
-        Vector2 homePosition = new Vector2(m_ghost.homePosition.x, m_ghost.homePosition.y);
-        Vector2 myPosition = new Vector2(m_ghost.getPosition().x / 30, m_ghost.getPosition().y / 30);
-        if (homePosition == myPosition)
-            return null;
-        int[][] boardsPaths = GameLoop.getInstance().gameBoard.BoardsPaths;
-        if (boardsPaths[(int) myPosition.y][(int) myPosition.x] != 1
-                || boardsPaths[(int) homePosition.y][(int) homePosition.x] != 1)
-            return null;
-        boolean[][] visited = new boolean[31][28];
-        visited[(int) myPosition.y][(int) myPosition.x] = true;
-        Queue<queueNode> queue = new LinkedList<>();
-        queueNode start = new queueNode(myPosition, 0);
-        queue.add(start);
-        Vector2[] neighbourhood = { new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0) };
-        int[][] distances = new int[31][28];
-        while (!queue.isEmpty()) {
-            queueNode current = queue.remove();
-            Vector2 currentPoint = current.point;
-
-            if (currentPoint.x == homePosition.x && currentPoint.y == homePosition.y) {
-                List<Vector2> steps2 = new ArrayList<Vector2>();
-                steps2.add(homePosition);
-                int x = (int) homePosition.x;
-                int y = (int) homePosition.y;
-                int tempDistance = current.dist - 1;
-                while (tempDistance != 0) {
-                    for (int k = 0; k < 4; k++) {
-                        int temp_x = x + (int) neighbourhood[k].x;
-                        int temp_y = y + (int) neighbourhood[k].y;
-                        if (distances[temp_y][temp_x] == tempDistance) {
-                            x = x + (int) neighbourhood[k].x;
-                            y = y + (int) neighbourhood[k].y;
-                            steps2.add(new Vector2(x, y));
-                            tempDistance--;
-                            break;
-                        }
-                    }
-                }
-                return steps2;
-            }
-
-            for (int i = 0; i < 4; i++) {
-                int row = (int) currentPoint.y + (int) neighbourhood[i].y;
-                int col = (int) currentPoint.x + (int) neighbourhood[i].x;
-
-                if (isCellInRange(row, col) && boardsPaths[row][col] == 1 && !visited[row][col]) {
-                    // mark cell as visited and enqueue it
-                    visited[row][col] = true;
-                    queueNode adjacentPoint = new queueNode(new Vector2(col, row), current.dist + 1);
-                    queue.add(adjacentPoint);
-                    distances[row][col] = current.dist + 1;
-                }
-            }
-        }
-        return null;
-    }
-
+    /**
+     * Metoda znajdująca najkrótszą ścieżkę do danego punktu na mapie, z miejsca, w którym duch się znajduje
+     * @return zwraca listę punktów do, których Pac-Man ma się przemieścić
+     */
     public List<Vector2> findPathToPoint(Vector2 point) {
-        Vector2 targetPosition = new Vector2((int)point.x, (int)point.y);
-        Vector2 myPosition = new Vector2((int)m_ghost.getPosition().x / 30, (int)m_ghost.getPosition().y / 30);
+        Vector2 targetPosition = new Vector2((int) point.x, (int) point.y);
+        Vector2 myPosition = new Vector2((int) m_ghost.getPosition().x / 30, (int) m_ghost.getPosition().y / 30);
         //Debug.LogError(myPosition + "->"+targetPosition);
         if (targetPosition.equals(myPosition))
             return new ArrayList<>();
@@ -236,7 +190,7 @@ public abstract class GhostController implements Runnable {
         Queue<queueNode> queue = new LinkedList<>();
         queueNode start = new queueNode(myPosition, 0);
         queue.add(start);
-        Vector2[] neighbourhood = { new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0) };
+        Vector2[] neighbourhood = {new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0)};
         int[][] distances = new int[31][28];
         while (!queue.isEmpty()) {
             queueNode current = queue.remove();
@@ -249,7 +203,7 @@ public abstract class GhostController implements Runnable {
                 int y = (int) targetPosition.y;
                 int tempDistance = current.dist - 1;
                 while (tempDistance != 0) {
-                    if(shouldThreadExit.get())
+                    if (shouldThreadExit.get())
                         return null;
                     for (int k = 0; k < 4; k++) {
                         int temp_x = x + (int) neighbourhood[k].x;
@@ -281,7 +235,10 @@ public abstract class GhostController implements Runnable {
         }
         return new ArrayList<>();
     }
-
+    /**
+     * Metoda znajdująca współrzędne punktu znajdującego się przed Pac-Manem
+     * @return współrzędne punktu znajdującego się przed Pac-Manem
+     */
     protected Vector2 find2DotsTowardsPacMan() {
         Vector2 targetPoint = new Vector2();
         MoveDirection pacManMoveDirection = GlobalReferenceManager.pacMan.getMoveDirection();
@@ -325,29 +282,45 @@ public abstract class GhostController implements Runnable {
         //Debug.Log("Pinky target x: "+targetPoint.x + "y: "+targetPoint.y);
         return targetPoint;
     }
-    protected Vector2 randPointInRange(){
-        Vector2 newPoint =  new Vector2();
-        Vector2 myPosition = new Vector2((int)m_ghost.getPosition().x/30,(int)m_ghost.getPosition().y/30);
-        int myPositionX = (int)myPosition.y;
-        int myPositionY = (int)myPosition.x;
+    /**
+     * Metoda losująca współrzędne punktu znajdującego w danym zakresie/okręgu
+     * @return współrzędne wylosowanego punktu
+     */
+    protected Vector2 randPointInRange() {
+        Vector2 newPoint = new Vector2();
+        Vector2 myPosition = new Vector2((int) m_ghost.getPosition().x / 30, (int) m_ghost.getPosition().y / 30);
+        int myPositionX = (int) myPosition.y;
+        int myPositionY = (int) myPosition.x;
         int board[][] = GameLoop.getInstance().gameBoard.BoardsPaths;
         //(x-a)^2 + (y-b)^2 = r^2 gdzie (a,b) to środek - pozycja ducha i r to promień
         List<Vector2> localOnes = GameLoop.getInstance().gameBoard.onesList;
         int sizeOfOnesList = localOnes.size();
         int index = ThreadLocalRandom.current().nextInt(0, sizeOfOnesList);
-        int x = (int)localOnes.get(index).x;
-        int y = (int)localOnes.get(index).y;
-        while(((Math.pow(x - myPositionX,2)+Math.pow(y - myPositionY,2))>=Math.pow(randMax,2)) &&
-                ((Math.pow(x - myPositionX,2)+Math.pow(y - myPositionY,2))<=Math.pow(randMin,2)) && x==myPositionX && y==myPositionY ){
-            if(shouldThreadExit.get())
+        int x = (int) localOnes.get(index).x;
+        int y = (int) localOnes.get(index).y;
+        while (((Math.pow(x - myPositionX, 2) + Math.pow(y - myPositionY, 2)) >= Math.pow(randMax, 2)) &&
+                ((Math.pow(x - myPositionX, 2) + Math.pow(y - myPositionY, 2)) <= Math.pow(randMin, 2)) && x == myPositionX && y == myPositionY) {
+            if (shouldThreadExit.get())
                 return null;
             index = ThreadLocalRandom.current().nextInt(0, sizeOfOnesList);
-            x = (int)localOnes.get(index).x;
-            y = (int)localOnes.get(index).y;
+            x = (int) localOnes.get(index).x;
+            y = (int) localOnes.get(index).y;
         }
         newPoint.x = y;
         newPoint.y = x;
 
         return newPoint;
+    }
+    /**
+     * Klasa pomocnicza w znajdywaniu najkrótszej ścieżki
+     */
+    static class queueNode {
+        Vector2 point;
+        int dist;
+
+        public queueNode(Vector2 point, int dist) {
+            this.point = point;
+            this.dist = dist;
+        }
     }
 }
