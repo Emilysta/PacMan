@@ -2,8 +2,11 @@ package com.Board;
 
 import com.Utility.Vector2;
 
+
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +45,7 @@ public class PredefinedBoard {
     public static String randFile() {
         //Random r = new Random();
         //int number = r.NextInt(3)+1;
-        String fileName = "Boards/board_1.txt";
+        String fileName = "/boards/board_1.txt";
         return fileName;
     }
 
@@ -54,7 +57,7 @@ public class PredefinedBoard {
     public void loadFromFile(String fileName) {
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(fileName));
+            reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(fileName)));
             for (int i = 0; i < 31; i++) {
                 String currentLine = reader.readLine();
                 if (currentLine != null) {

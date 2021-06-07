@@ -8,6 +8,7 @@ import com.GameObjects.Coin.Coin;
 import com.GameObjects.Ghosts.Ghost;
 import com.GameObjects.Ghosts.GhostType;
 import com.GameObjects.PacMan.PacMan;
+import com.Utility.Debug;
 import com.Utility.GlobalReferenceManager;
 import com.Utility.LeaderboardPosition;
 import com.Utility.Sprite;
@@ -141,7 +142,7 @@ public class BoardController {
 
     private void openBoard() throws Exception {
         BoardGridPane.setStyle("-fx-background-color: #000000;");
-        String filePath = "file:TERRAIN/";
+        String filePath = "/";
         for (int i = 0; i < m_gameBoard.BoardPathTypes.length; i++) {
             for (int j = 0; j < m_gameBoard.BoardPathTypes[i].length; j++) {
                 if (m_gameBoard.BoardPathTypes[i][j] != PathTypes.EMPTY) {
