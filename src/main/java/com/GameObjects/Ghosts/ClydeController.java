@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
-
+/**
+ * Kontroller zachowania ducha Clyde'a, rozszerza kontroller ogólnego zachowania ducha
+ */
 public class ClydeController extends GhostController {
     private int randMin = 4;
     private int randMax = 6;
@@ -20,7 +22,9 @@ public class ClydeController extends GhostController {
         super(ghostModeController, ghost);
         m_stepsInScatter = new ArrayList<Vector2>();
     }
-
+    /**
+     * Nadpisana metoda, określa zachowanie Clyde'a w trybie pościgu
+     */
     @Override
     public void chaseMode() {
         if(shouldThreadExit.get())
@@ -35,7 +39,9 @@ public class ClydeController extends GhostController {
             m_lastUpdate = System.nanoTime();
         }
     }
-
+    /**
+     * Nadpisana metoda, określa zachowanie Clyde'a w trybie Scatter
+     */
     @Override
     public void distractMode() {
 

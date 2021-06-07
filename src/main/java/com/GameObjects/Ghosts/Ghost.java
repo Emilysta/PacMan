@@ -7,17 +7,26 @@ import com.Utility.MoveDirection;
 import com.Utility.Sprite;
 import com.Utility.Vector2;
 
+/**
+ * Klasa ducha będąca rozszerzeniem klasy bazowej - GameObject
+ */
 public class Ghost extends GameObject {
 
-    private GhostModeController m_ghostModeController;
-    private GhostMode m_ghostMode;
-    private GhostController m_ghostController;
-    private final Thread m_controllerThread;
-    private final Thread m_controllerThread2;
+    private GhostModeController m_ghostModeController;//kontroler ruchów konkretnego ducha
+    private GhostMode m_ghostMode; // tryb, w którym duch się znajduje
+    private GhostController m_ghostController; //kontroler ruchów konkretnego ducha
+    private final Thread m_controllerThread; //wątek uruchamiający kontroler trybu konkretnego ducha
+    private final Thread m_controllerThread2; //wątek uruchamiający kontroler ruchów konkretnego ducha
+    private MoveDirection m_moveDirection = MoveDirection.None; //określa kierunek ruchu
 
-    private MoveDirection m_moveDirection = MoveDirection.None;
-    public Vector2 homePosition; //narazie jako wejście do ich domku
-    public GhostType m_ghostType;
+    public Vector2 homePosition; //położenie domu na mapie
+    public GhostType m_ghostType; // określa typ ducha  - Blinky,Inky,Clyde,Pinky
+
+    /**
+     * Konstruktor ducha, przypisuje mu odpowiednie zdjęcie oraz typ ducha, jakim jest
+     * @param sprite zdjęcie, które zostanie wyrednerowane
+     * @param ghostType dyo ducha - Blinky, Inky, Clyde, Pinky
+     */
     public Ghost(Sprite sprite, GhostType ghostType) {
         super(sprite);
         m_ghostModeController = new GhostModeController(this);
@@ -51,7 +60,9 @@ public class Ghost extends GameObject {
         m_controllerThread2 = new Thread(m_ghostController);
     }
 
-
+    /**
+     * Nadpisana metoda wywołująca się na starcie gry, uruchamia wątki
+     */
     @Override
     protected void onStart() {
         m_controllerThread.start();
@@ -59,6 +70,9 @@ public class Ghost extends GameObject {
         m_controllerThread2.start();
     }
 
+    /**
+     *   Nadpisana metoda wywołująca się w każdej klatece gry, ustawia kierunek ruchu obiektu, oraz wywołuje metodę poruszania się
+     */
     @Override
     protected void onUpdate() {
         m_moveDirection = m_ghostController.moveDirection;
@@ -66,6 +80,10 @@ public class Ghost extends GameObject {
         move();
     }
 
+    /**
+     *  Nadpisana metoda wywołująca się przy zakończeniu gry, lub zniszczeniu obiektu
+     *  Kończy działanie wątków kontrolujących zachowanie obiektu
+     */
     @Override
     protected void onExit() {
         if (m_controllerThread.isAlive() || m_controllerThread2.isAlive()) {
@@ -90,8 +108,8 @@ public class Ghost extends GameObject {
     }
 
     /**
-     * Method moves pacman in the gameWorld according to it's current move
-     * direction. If move is illegal, it stops pacman in place.
+     * Metoda przemieszcza ducha w świecie, w zalezności od ustalonego kierunku.
+     * Jeśli ruch jest niedozwolony, duch zatrzymuje się w miejscu.
      */
     private void move() {
         if (CollisionManager.checkIfMovePossible(m_position, m_moveDirection)) {

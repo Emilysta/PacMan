@@ -7,6 +7,9 @@ import com.Utility.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Kontroller zachowania ducha Blinky'iego, rozszerza kontroller ogólnego zachowania ducha
+ */
 public class BlinkyController extends GhostController{
     private long m_lastUpdate;
     private Vector2 m_startPoint = new Vector2(26*30,30);
@@ -15,7 +18,9 @@ public class BlinkyController extends GhostController{
         super(ghostModeController, ghost);
         m_stepsInScatter = new ArrayList<Vector2>();
     }
-
+    /**
+     * Nadpisana metoda, określa zachowanie Blinky'iego w trybie pościgu
+     */
     @Override
     public void chaseMode() {
         if(System.nanoTime() - m_lastUpdate > 1000000000) {
@@ -26,7 +31,9 @@ public class BlinkyController extends GhostController{
             m_lastUpdate =System.nanoTime();
         }
     }
-
+    /**
+     * Nadpisana metoda, określa zachowanie Blinky'iego w trybie Scatter
+     */
     @Override
     public void distractMode() { //inaczej scatterMode
             m_steps = findPathToPoint(m_startPoint);

@@ -11,6 +11,9 @@ import com.Utility.Vector2;
 
 import java.util.List;
 
+/**
+ * Kontroller zachowania ducha Inky'iego, rozszerza kontroller ogólnego zachowania ducha
+ */
 public class InkyController extends GhostController {
     private long m_lastUpdate;
     private Vector2 m_startPoint = new Vector2(26 * 30, 29 * 30);
@@ -20,6 +23,9 @@ public class InkyController extends GhostController {
         super(ghostModeController, ghost);
     }
 
+    /**
+     * Nadpisana metoda, określa zachowanie Inky'iego w trybie pościgu
+     */
     @Override
     public void chaseMode() {
         if(shouldThreadExit.get())
@@ -44,12 +50,19 @@ public class InkyController extends GhostController {
             m_lastUpdate = System.nanoTime();
         }
     }
-
+    /**
+     * Nadpisana metoda, określa zachowanie Inky'iego w trybie Scatter
+     */
     @Override
     public void distractMode() {
 
     }
 
+    /**
+     * Metoda znajdująca najbliższy punkt na planszy, jeśli punkty startowy znajduje się poza zakresem planszy
+     * @param startPoint - punkt startowy, dla niego poszukiwany jest najbliższy poprawny punkt na planszy
+     * @return najbliższy poprawny punkt na planszy
+     */
     private Vector2 findNearestInRange(Vector2 startPoint) {
         Vector2 nearestInRange = new Vector2();
         Vector2 point = new Vector2(startPoint.x, startPoint.y);
@@ -78,6 +91,11 @@ public class InkyController extends GhostController {
         return nearestInRange;
     }
 
+    /**
+     * Metoda poszukująca najbliższego poprawnego sąsiada
+     * @param point punkt, dla którego poszukuje się poprawnego sąsiada - tzn. sąsiedniego pola, które będzie ścieżką na planszy
+     * @return miejsce na planszy, które zawiera wartośc 1
+     */
     private Vector2 lookAtNeighbourhood(Vector2 point) {
         Vector2 newPoint = new Vector2();
         BoardTile ngbhOfPoints[][] = GameLoop.getInstance().gameBoard.Board;
@@ -116,6 +134,14 @@ public class InkyController extends GhostController {
         return newPoint;
     }
 
+    /**
+     *
+     * @param cellToCheckNeighbourhood - komórka dla której sprawdzamy czy posiada sąsiada będącego ścieżką
+     * @param ngbhType - parametr, który ustawia funkcja, jeśli funkcja zwróci false - zmienna zosatnie ustawiona
+     *                 na NeighbourhoodType.None, jesli funkcja zwróci true - może wystąpić każdy inny typ sąsiedztwa
+     * @return true, jeśli w sąsiedztwie znajduje się wartość "1" w tablicy - sąsiad jest ścieżką na planszy,
+     *          false, jesli w sąsiedztwie nie ma wartości "1"
+     */
     private boolean isOneInNeighbourhood(BoardTile cellToCheckNeighbourhood, NeighbourhoodType ngbhType) {
         Neighbourhood ngbh = cellToCheckNeighbourhood.getTilesAround();
         if (ngbh.m_left == 1) {

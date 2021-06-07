@@ -19,6 +19,10 @@ public class GhostModeController implements Runnable {
     public AtomicBoolean shouldThreadExit = new AtomicBoolean();
     private Ghost m_ghost;
 
+    /**
+     * Konstruktor klasy, przypisuje odpowiedniego ducha do swojego pola
+     * @param ghost - duch,dla którego wątek będzie Mode Controllerem
+     */
     public GhostModeController(Ghost ghost) {
         m_ghost = ghost;
     }
@@ -38,6 +42,9 @@ public class GhostModeController implements Runnable {
         }
     }
 
+    /**
+     * Metoda sprawdzająca, w jakim trybie powinien znajdować się duszek
+     */
     public void checkMode() {
         ghostMode = GhostMode.ChaseMode;
         if (GlobalReferenceManager.pacMan.isPacmanPoweredUp()) {
