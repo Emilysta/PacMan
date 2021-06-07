@@ -9,6 +9,7 @@ import com.GameObjects.Ghosts.Ghost;
 import com.GameObjects.Ghosts.GhostType;
 import com.GameObjects.PacMan.PacMan;
 import com.Utility.GlobalReferenceManager;
+import com.Utility.LeaderboardPosition;
 import com.Utility.Sprite;
 
 import javafx.animation.FadeTransition;
@@ -23,6 +24,7 @@ import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -46,6 +48,8 @@ public class BoardController {
     private GameLoop m_mainGameLoop;
     private PredefinedBoard m_gameBoard;
 
+    private boolean m_isInGame;
+
     public void initializeGame() {
         try {
             GlobalReferenceManager.clearData();
@@ -58,14 +62,12 @@ public class BoardController {
             m_mainGameLoop.setBoard(m_gameBoard);
             setUpGame();
             addVisuals();
-            //blendCanvas.setVisible(false);
             blendCanvas.setStyle("-fx-background-color: rgba(1,0,0,0.2)");
             blendCanvas.toFront();
             goToMainWindowButton.setVisible(false);
             tryAgainButton.setVisible(false);
             tryAgainButton.toFront();
             goToMainWindowButton.toFront();
-            //Platform.runLater(()->blendCanvas.getGraphicsContext2D().setFill(Color.color(0,0,0,1)));
             blendCanvas.setMouseTransparent(true);
             tryAgainButton.setOnAction(e -> {
                 tryAgainButton.setDisable(true);
@@ -76,6 +78,7 @@ public class BoardController {
                 initializeGame();
             });
             goToMainWindowButton.setOnAction((event) -> Main.getInstance().goToMainWindow());
+            m_isInGame = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -86,15 +89,27 @@ public class BoardController {
     }
 
     public void loseGame() {
-        m_mainGameLoop.stop();
-        Platform.runLater(() -> {
-            mainCanvas.setMouseTransparent(true);
-            goToMainWindowButton.setVisible(true);
-            tryAgainButton.setVisible(true);
-            goToMainWindowButton.setDisable(false);
-            tryAgainButton.setDisable(false);
-            blendCanvas.setVisible(true);
-        });
+        if (m_isInGame) {
+            m_isInGame=false;
+            m_mainGameLoop.stop();
+            Platform.runLater(() -> {
+                var dialog = new TextInputDialog("User");
+                dialog.setTitle("Save highscore");
+                dialog.setHeaderText("Please enter your name for the leaderboard");
+                dialog.setContentText("Leaderboard name:");
+                var result = dialog.showAndWait();
+                if (result.isPresent())
+                    GlobalReferenceManager.saveLeaderboardPosition(result.get());
+                else
+                    GlobalReferenceManager.saveLeaderboardPosition("default");
+                mainCanvas.setMouseTransparent(true);
+                goToMainWindowButton.setVisible(true);
+                tryAgainButton.setVisible(true);
+                goToMainWindowButton.setDisable(false);
+                tryAgainButton.setDisable(false);
+                blendCanvas.setVisible(true);
+            });
+        }
     }
 
     private void setUpGame() {

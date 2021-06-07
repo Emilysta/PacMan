@@ -1,6 +1,7 @@
 package com.UI;
 
 import com.Main;
+import com.Utility.GlobalReferenceManager;
 import com.Utility.LeaderboardPosition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,44 +27,12 @@ public class LeaderboardController implements Initializable {
     private ListView<LeaderboardPosition> LeaderboardListView;
     private ObservableList<LeaderboardPosition> leaderboardPositions;
 
-
-    public void loadLeaderboard() {
-        leaderboardPositions = FXCollections.observableArrayList();
-        File file = new File(fileName);
-        try {
-            if (!file.createNewFile()) {
-                FileInputStream fileStream = new FileInputStream(fileName);
-                ObjectInputStream objectStream = new ObjectInputStream(fileStream);
-                boolean isEndOfFile = false;
-                while (!isEndOfFile) {
-                    LeaderboardPosition position = (LeaderboardPosition) objectStream.readObject();
-                    if (position != null)
-                        leaderboardPositions.add(position);
-                    else
-                        isEndOfFile = true;
-                }
-                objectStream.close();
-                fileStream.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        var pos = new LeaderboardPosition();
-        pos.Name = "Majkel";
-        pos.Score = 999;
-        leaderboardPositions.add(pos);
-        LeaderboardListView.setItems(leaderboardPositions);
-        //LeaderboardList.setListData(leaderboardPositions.toArray());
-    }
-
     public void BackButtonClicked(MouseEvent mouseEvent) {
         Main.getInstance().goToMainWindow();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        loadLeaderboard();
+        LeaderboardListView.setItems(FXCollections.observableArrayList(GlobalReferenceManager.getLeaderboard()));
     }
 }
