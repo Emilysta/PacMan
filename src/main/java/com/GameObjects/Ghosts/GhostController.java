@@ -1,10 +1,8 @@
 package com.GameObjects.Ghosts;
 
 import com.GameLoop.GameLoop;
-import com.Utility.Debug;
-import com.Utility.GlobalReferenceManager;
-import com.Utility.MoveDirection;
-import com.Utility.Vector2;
+import com.Utility.*;
+import javafx.scene.image.Image;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -15,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Klasa - rodzic - dla poszczególnych duchów, klasa działa jako osobny wątek i
- * sprawdza ruchy duchów do wykonanania
+ * sprawdza ruchy duchów do wykonania
  */
 public abstract class GhostController implements Runnable {
     private int randMin = 4;
@@ -28,6 +26,7 @@ public abstract class GhostController implements Runnable {
     protected List<Vector2> m_steps;
     public AtomicBoolean shouldThreadExit = new AtomicBoolean();
     public MoveDirection moveDirection = MoveDirection.None;
+
 
     public GhostController(GhostModeController ghostModeController, Ghost ghost) {
         m_ghostModeController = ghostModeController;
@@ -43,21 +42,38 @@ public abstract class GhostController implements Runnable {
                     return;
                 //m_GhostMode = m_ghostModeController.ghostMode; //toDo podmiana na to
                 m_GhostMode = GhostMode.ChaseMode;
-
+                String whichGhost = "";
+                switch(m_ghost.m_ghostType) {
+                    case Blinky: whichGhost = "/red.png";
+                        break;
+                    case Inky: whichGhost = "/blue.png";
+                        break;
+                    case Clyde: whichGhost ="/orange.png";
+                        break;
+                    case Pinky: whichGhost = "/pink.png";
+                }
                 switch (m_GhostMode) {
-                    case WanderingMode:
+                    case WanderingMode: {
+                        m_ghost.setSprite(new Sprite(new Image(whichGhost), 30, 30));
                         wanderingMode();
                         break;
-                    case DistractMode:
+                    }
+                    case DistractMode: {
+                        m_ghost.setSprite(new Sprite(new Image(whichGhost), 30, 30));
                         distractMode();
                         break;
+                    }
                     // toDo to check
-                    case ChaseMode:
+                    case ChaseMode: {
+                        m_ghost.setSprite(new Sprite(new Image(whichGhost), 30, 30));
                         chaseMode();
                         break;
-                    case DeadMode:
+                    }
+                    case DeadMode: {
+                        m_ghost.setSprite(new Sprite(new Image("/dead.png"), 30, 30));
                         deadMode();
                         break;
+                    }
                 }
 
                 if (m_ghost.getPosition().equals(m_ghost.homePosition)) {

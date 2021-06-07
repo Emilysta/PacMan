@@ -4,63 +4,66 @@ import com.GameLoop.GameLoop;
 import com.Utility.Sprite;
 import com.Utility.Vector2;
 /**
- * Abstract class being the base for all gameObjects in the game
- * Implements the observer pattern by adding itself to listeners list in the
- * main game loop
+ * Klasa abstrakcyjna - klasa bazowa dla wszystkich obiektów gry.
+ * Implementuje obserwatora dodając siebie do listy słuchaczy w głównej pętli gry
  */
 public abstract class GameObject {
 
     public Sprite objectSprite;
 
     protected Vector2 m_position = new Vector2(0, 0);
-
     /**
-     * Creates a new game object and adds it into the listeners list
-     * @param sprite - the sprite with which the game object should render
+     * Konstruktor klasy, Tworzy nowy obiekt i dodaje do listy słuchaczy, ustawia element klasy jakim jest zdjęcia,
+     * które podczas gry będzie renderowane.
+     * @param sprite - zdjęcie do wyrenderowania
      */
     public GameObject(Sprite sprite) {
         objectSprite = sprite;
         GameLoop.getInstance().addListener(this);
     }
-
     /**
-     * Method gets called when the game loop starts or a new game object is
-     * created 
+     * Metoda wywoływana na poczatku gry lub przy stworzeniu obiektu
      */
     public final void start() {
         onStart();
     }
-
     /**
-     * Method gets called every frame
+     * Metoda aktualizująca obiekt, wywoływana podczas każdej klatki
      */
     public final void update() {
         onUpdate();
     }
-
     /** 
-     * Method gets called on game exit or when an gameObject gets destroyed
+     * Metoda wywoływana na końcu gry lub w momencie zniszenia obiektu
      */
     public final void exit() {
         onExit();
     }
     /**
-     * Method returns the current position of the gameObject
-     * @return vector2 of current position
+     * Metoda zwracająca aktualną pozycję obiektu na scenie
+     * @return vector2 zwierający obecną pozycję
      */
     public Vector2 getPosition() {
         return m_position;
     }
     /**
-     * Method gets called on start of game loop or creation of game object
+     * Metoda ustawiająca zdjęcie przynależne do obiektu
+     */
+    public void setSprite(Sprite sprite){
+        objectSprite = sprite;
+    }
+    /**
+     * Metoda wywoływana na poczatku gry lub przy stworzeniu obiektu
      */
     protected abstract void onStart();
     /**
-     * Method gets called every frame
+     * Metoda aktualizująca obiekt, wywoływana podczas każdej klatki
      */
     protected abstract void onUpdate();
     /**
-     * Method gets called on game exit or when the game object is destroyed
+     * Metoda wywoływana na końcu gry lub w momencie zniszenia obiektu
      */
     protected abstract void onExit();
+
+
 }

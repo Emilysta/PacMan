@@ -12,13 +12,12 @@ public class Ghost extends GameObject {
     private GhostModeController m_ghostModeController;
     private GhostMode m_ghostMode;
     private GhostController m_ghostController;
-    private GhostType m_ghostType;
     private final Thread m_controllerThread;
     private final Thread m_controllerThread2;
 
     private MoveDirection m_moveDirection = MoveDirection.None;
     public Vector2 homePosition; //narazie jako wejście do ich domku
-
+    public GhostType m_ghostType;
     public Ghost(Sprite sprite, GhostType ghostType) {
         super(sprite);
         m_ghostModeController = new GhostModeController(this);
