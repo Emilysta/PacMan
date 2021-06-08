@@ -1,9 +1,0 @@
-module:PacManMaven
-com
-com.Board
-com.GameLoop
-com.GameObjects
-com.GameObjects.Coin
-com.GameObjects.PacMan
-com.UI
-com.Utility
