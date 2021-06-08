@@ -2,4 +2,7 @@
 out/
 target/
 .vscode/
+.settings/
+.classpath
+.project
 highscores
