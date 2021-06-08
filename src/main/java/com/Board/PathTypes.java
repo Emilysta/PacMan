@@ -1,5 +1,8 @@
 package com.Board;
 
+/**
+ * Występujące rodzaje ścieżek
+ */
 public enum PathTypes {
     EMPTY,
     VERTICAL,

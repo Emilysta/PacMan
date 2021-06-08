@@ -1,6 +1,8 @@
 package com.Board;
 
-
+/**
+ * Klasa określająca pojedynczą komórkę na planszy
+ */
 public class BoardTile {
 
     private Neighbourhood m_NGBH = new Neighbourhood();

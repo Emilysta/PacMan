@@ -39,11 +39,4 @@ public class ClydeController extends GhostController {
             m_lastUpdate = System.nanoTime();
         }
     }
-    /**
-     * Nadpisana metoda, określa zachowanie Clyde'a w trybie Scatter
-     */
-    @Override
-    public void distractMode() {
-
-    }
 }

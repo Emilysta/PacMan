@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Klasa pozwalająca wczytać predefiniowane plansze do gry
@@ -43,9 +44,11 @@ public class PredefinedBoard {
      * @return zwraca nazwę pliku zwierającego wygląd planszy
      */
     public static String randFile() {
-        //Random r = new Random();
-        //int number = r.NextInt(3)+1;
-        String fileName = "/boards/board_1.txt";
+        Random r = new Random();
+        int number = r.nextInt(2)+1;
+        String fileName = "/boards/board_";
+        fileName = fileName + number;
+        fileName = fileName + ".txt";
         return fileName;
     }
 
@@ -155,7 +158,9 @@ public class PredefinedBoard {
             }
         }
     }
-
+    /**
+     * Metoda ustawiająca typ ścieżki do wyrenderowania na mapie
+     */
     public void setPathTypes() {
         for (int i = 0; i < Board.length; i++) {
             for (int j = 0; j < Board[i].length; j++) {

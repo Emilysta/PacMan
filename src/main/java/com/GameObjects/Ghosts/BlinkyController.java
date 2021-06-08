@@ -31,12 +31,4 @@ public class BlinkyController extends GhostController{
             m_lastUpdate =System.nanoTime();
         }
     }
-    /**
-     * Nadpisana metoda, określa zachowanie Blinky'iego w trybie Scatter
-     */
-    @Override
-    public void distractMode() { //inaczej scatterMode
-            m_steps = findPathToPoint(m_startPoint);
-
-    }
 }

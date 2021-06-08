@@ -19,7 +19,7 @@ public class Ghost extends GameObject {
     private final Thread m_controllerThread2; // wątek uruchamiający kontroler ruchów konkretnego ducha
     private MoveDirection m_moveDirection = MoveDirection.None; // określa kierunek ruchu
     private float m_speed = 2;
-
+    public Vector2 destination = new Vector2();
     public Vector2 homePosition; // położenie domu na mapie
     public GhostType m_ghostType; // określa typ ducha - Blinky,Inky,Clyde,Pinky
 
@@ -34,28 +34,30 @@ public class Ghost extends GameObject {
         super(sprite);
         m_ghostModeController = new GhostModeController(this);
         m_controllerThread = new Thread(m_ghostModeController);
-        m_position = new Vector2(90, 30);
-        homePosition = new Vector2(14, 11);
         m_ghostType = ghostType;
 
         switch (ghostType) {
             case Blinky: {
-                m_position = new Vector2(26 * 30, 30);
+                m_position = new Vector2(14 * 30, 11* 30);
+                homePosition = new Vector2(14, 11);
                 m_ghostController = new BlinkyController(m_ghostModeController, this);
                 break;
             }
             case Inky: {
-                m_position = new Vector2(26 * 30, 29 * 30);
+                m_position = new Vector2(13 * 30, 11 * 30);
+                homePosition = new Vector2(13, 11);
                 m_ghostController = new InkyController(m_ghostModeController, this);
                 break;
             }
             case Clyde: {
-                m_position = new Vector2(30, 29 * 30);
+                m_position = new Vector2(12*30, 11 * 30);
+                homePosition = new Vector2(12, 11);
                 m_ghostController = new ClydeController(m_ghostModeController, this);
                 break;
             }
             case Pinky: {
-                m_position = new Vector2(120, 30);
+                m_position = new Vector2(11*30, 11*30);
+                homePosition = new Vector2(11, 11);
                 m_ghostController = new PinkyController(m_ghostModeController, this);
                 break;
             }
@@ -80,7 +82,7 @@ public class Ghost extends GameObject {
     @Override
     protected void onUpdate() {
         m_ghostMode = m_ghostModeController.ghostMode;
-        m_moveDirection = m_ghostController.moveDirection;
+        //m_moveDirection = m_ghostController.moveDirection;
         // Debug.Log("Update duszka: " + m_moveDirection);
         move();
     }
@@ -117,8 +119,30 @@ public class Ghost extends GameObject {
      * Jeśli ruch jest niedozwolony, duch zatrzymuje się w miejscu.
      */
     private void move() {
-        checkSpeed();
 
+        Vector2 move = destination;
+        Vector2 myPosition = m_position;
+
+        if (myPosition.y != move.y * 30) {
+            if (myPosition.y < move.y * 30)
+                m_moveDirection = MoveDirection.Down;
+            else
+                m_moveDirection = MoveDirection.Up;
+        }
+        if (myPosition.x != move.x * 30) {
+            if (myPosition.x < move.x * 30)
+                m_moveDirection = MoveDirection.Right;
+            else
+                m_moveDirection = MoveDirection.Left;
+        }
+
+        checkSpeed();
+        if(m_position.equals(destination.multiply(30)))
+            return;
+        if(!m_position.equals(destination.multiply(30)) && m_moveDirection == MoveDirection.None && !destination.equals(new Vector2())) {
+            m_position = destination.multiply(30);
+            return;
+        }
         if (CollisionManager.checkIfMovePossible(m_position, m_moveDirection)) {
             if (m_moveDirection == MoveDirection.Up)
                 m_position.y -= m_speed;

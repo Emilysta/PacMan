@@ -107,20 +107,9 @@ public class GameLoop implements Runnable {
         final long frameTime = 1000000000 / m_fps;
         m_isGamePlaying = true;
         startAllGameObjects();
-        long second = 0;
-        int fps = 0;
         while (m_isGamePlaying) {
             long lastLoopTime = System.nanoTime();
             playOneFrame(frameTime, lastLoopTime);
-            /*
-            second += System.nanoTime() - lastLoopTime;
-            fps += 1;
-            if (second >= 1000000000) {
-                Debug.Log("FPS: " + fps);
-                fps = 0;
-                second = 0;
-            }
-            */
         }
     }
 

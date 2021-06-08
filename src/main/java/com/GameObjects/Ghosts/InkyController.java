@@ -37,25 +37,18 @@ public class InkyController extends GhostController {
             Vector2 pointInFrontOfPacMan = find2DotsTowardsPacMan();
             Vector2 blinkyPosition = new Vector2((int) GlobalReferenceManager.blinky.getPosition().x / 30, (int) GlobalReferenceManager.blinky.getPosition().y / 30);
             Vector2 movementVector = new Vector2((int) ((pointInFrontOfPacMan.x - blinkyPosition.x) * 2), (int) ((pointInFrontOfPacMan.y - blinkyPosition.y) * 2));
-            Vector2 positionToMove = new Vector2((int) (blinkyPosition.x + movementVector.x), (int) (blinkyPosition.y + movementVector.y));
-            if (!isCellInRange((int) positionToMove.y, (int) positionToMove.x)) {
+            Vector2 positionToMove = new Vector2((int) (blinkyPosition.x), (int) (blinkyPosition.y));
+            /*if (!isCellInRange((int) positionToMove.y, (int) positionToMove.x)) {
                 positionToMove = findNearestInRange(positionToMove);
             }
             if (boards[(int) positionToMove.y][(int) positionToMove.x] != 1) {
                 positionToMove = lookAtNeighbourhood(positionToMove);
-            }
+            }*/
             //Debug.Log("Inky x:" + positionToMove.x + " y:" + positionToMove.y);
             m_steps = findPathToPoint(positionToMove);
-            //Debug.Log("Inky size: "+m_steps.size());
+           //Debug.Log("Inky size: "+m_steps.size());
             m_lastUpdate = System.nanoTime();
         }
-    }
-    /**
-     * Nadpisana metoda, określa zachowanie Inky'iego w trybie Scatter
-     */
-    @Override
-    public void distractMode() {
-
     }
 
     /**

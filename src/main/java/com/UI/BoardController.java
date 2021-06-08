@@ -19,9 +19,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -36,6 +34,8 @@ public class BoardController {
     @FXML
     private GridPane BoardGridPane;
     @FXML
+    private GridPane BoardGridPane2;
+    @FXML
     private Button tryAgainButton;
     @FXML
     private Button goToMainWindowButton;
@@ -46,12 +46,28 @@ public class BoardController {
     private boolean m_isInGame;
 
     /**
-     * Metoda ustawia aktualny wynik gracza do wyswietlenia
+     * Metoda ustawia aktualny wynik gracza do wyswietlenia, oraz sprawdza,
+     * czy na danej planszy są jeszcze pieniążki, jeśli ich nie ma to tworzy nowa grę i przypisuje pieniążki do nowej gry.
+     *
      * 
      * @param score - wynik gracza
      */
     public void setScore(int score) {
         scoreText.set("Score: " + score);
+        if(GlobalReferenceManager.Coins.size()==0)
+        {
+            m_mainGameLoop.stop();
+            var dialog = new Alert(Alert.AlertType.CONFIRMATION);
+            dialog.setTitle("Play next level");
+            dialog.setContentText("Do you want to play next level?");
+            var result = dialog.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                initializeGame(score);
+            }
+            else {
+                Main.getInstance().goToMainWindow();
+            }
+        }
     }
 
     /**
@@ -77,13 +93,35 @@ public class BoardController {
     }
 
     /**
+     * Metoda inicjalizująca nowa gre. Ustawia wszystkie potrzebne zmienne, wczytuje nową
+     * plansze, tworzy obiekty w grze i rozpoczyna glowna petle gry, ustawia wynik z poprzedniego poziomu
+     */
+    public void initializeGame(int score) {
+        try {
+            GlobalReferenceManager.clearData(score);
+            GlobalReferenceManager.boardController = this;
+            m_gameBoard = new PredefinedBoard();
+            setUpBoard();
+            openBoard();
+            m_mainGameLoop = GameLoop.getInstance();
+            m_mainGameLoop.clearData();
+            m_mainGameLoop.setBoard(m_gameBoard);
+            setUpGame();
+            addVisuals();
+            m_isInGame = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Metoda przerywa gre, wyswietla powiadomienie o zapisaniu wyniku do tablicy
      * oraz daje wybór ponownego zagrania w gre, lub wyjscia do menu głownego
      */
     public void loseGame() {
         if (m_isInGame) {
             m_isInGame = false;
-            m_mainGameLoop.stop();
+            //m_mainGameLoop.stop();
             Platform.runLater(() -> {
                 var dialog = new TextInputDialog("User");
                 dialog.setTitle("Save highscore");
@@ -94,12 +132,17 @@ public class BoardController {
                 if (result.isPresent())
                     GlobalReferenceManager.saveLeaderboardPosition(result.get());
                 mainCanvas.setMouseTransparent(true);
+                BoardGridPane2.setStyle("-fx-background-color: #0000007D;");
                 goToMainWindowButton.setVisible(true);
                 tryAgainButton.setVisible(true);
                 goToMainWindowButton.setDisable(false);
                 tryAgainButton.setDisable(false);
                 blendCanvas.setVisible(true);
+                tryAgainButton.toFront();
+                goToMainWindowButton.toFront();
+
             });
+            m_mainGameLoop.stop();
         }
     }
 
@@ -150,6 +193,7 @@ public class BoardController {
      */
     private void openBoard() throws Exception {
         BoardGridPane.setStyle("-fx-background-color: #000000;");
+        BoardGridPane.getChildren().removeIf(x -> x.getClass().equals(ImageView.class));
         String filePath = "/";
         for (int i = 0; i < m_gameBoard.BoardPathTypes.length; i++) {
             for (int j = 0; j < m_gameBoard.BoardPathTypes[i].length; j++) {
@@ -169,19 +213,17 @@ public class BoardController {
         Label lbl = new Label();
         BoardGridPane.add((lbl), 0, 32, 12, 1);
         lbl.textProperty().bind(scoreText);
-        blendCanvas.setStyle("-fx-background-color: rgba(1,0,0,0.2)");
-        blendCanvas.toFront();
         goToMainWindowButton.setVisible(false);
         tryAgainButton.setVisible(false);
         tryAgainButton.toFront();
         goToMainWindowButton.toFront();
-        blendCanvas.setMouseTransparent(true);
         tryAgainButton.setOnAction(e -> {
             tryAgainButton.setDisable(true);
             goToMainWindowButton.setDisable(true);
             tryAgainButton.setVisible(false);
             goToMainWindowButton.setVisible(false);
             blendCanvas.setVisible(false);
+            BoardGridPane2.setStyle("-fx-background-color: #00000000;");
             initializeGame();
         });
         goToMainWindowButton.setOnAction((event) -> Main.getInstance().goToMainWindow());

@@ -70,6 +70,19 @@ public class GlobalReferenceManager {
     }
 
     /**
+     * Czysci klase, przygotowujac ja na kolejna gre i ustawia wynik z poprzedniej gry
+     */
+    public static void clearData(int score) {
+        pacMan = null;
+        pinky = null;
+        inky = null;
+        blinky = null;
+        clyde = null;
+        Coins = new ConcurrentLinkedQueue<>();
+        m_score = score;
+    }
+
+    /**
      * Metoda zapisuje nowa pozycje z wynikiem do pliku z wynikami.
      * 
      * @param name - nazwa z jaka zapisac wynik
