@@ -1,7 +1,7 @@
 package com.Utility;
 
 /**
- * Class represents a two dimensional vector
+ * Klasa reprezentuja wektor 2 wymiarowy
  */
 public class Vector2 {
     public float x;
@@ -15,6 +15,10 @@ public class Vector2 {
     public Vector2(float x, float y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Vector2 multiply(float value) {
+        return new Vector2(x * value, y * value);
     }
 
     @Override

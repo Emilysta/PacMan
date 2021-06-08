@@ -17,7 +17,7 @@ import com.UI.BoardController;
 import javafx.application.Platform;
 
 /**
- * Helper class holding instances of in-game objects.
+ * Klasa pomocnicza przechowujaca instancje aktualnych obiektow
  */
 public class GlobalReferenceManager {
     public static PacMan pacMan;
@@ -30,6 +30,7 @@ public class GlobalReferenceManager {
     public static BoardController boardController;
 
     private static int m_score = 0;
+    private static int m_powerUps = 0;
     private static String m_leaderboardFilename = "highscores";
     private static ArrayList<LeaderboardPosition> m_leaderboardPositions;
 
@@ -38,32 +39,25 @@ public class GlobalReferenceManager {
     }
 
     /**
-     * @return current player score
+     * @return aktualny wynik gracza
      */
     public static int getScore() {
         return m_score;
     }
 
     /**
-     * Adds given value to the overall score and updates the score on board
-     * controller thread, to reflect the changes on screen
+     * Dodaje wartosc do aktualnego wyniku gracza, i powiadamia o tym klase
+     * boardController w celu wyswietlenia tej wartosci na scenie.
      * 
-     * @param value
+     * @param value - wartosc do dodania
      */
     public static void addScore(int value) {
         m_score += value;
-        // Debug.LogWarning("dodano scorea:" + m_score);
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                boardController.setScore(m_score);
-
-            }
-        });
+        Platform.runLater(() -> boardController.setScore(m_score));
     }
 
     /**
-     * Clears all data from global reference manager
+     * Czysci klase, przygotowujac ja na kolejna gre
      */
     public static void clearData() {
         pacMan = null;
@@ -76,42 +70,67 @@ public class GlobalReferenceManager {
     }
 
     /**
-     * Method saves given leaderboard position into the file specified in variable
-     * LeaderboardFilename
+     * Metoda zapisuje nowa pozycje z wynikiem do pliku z wynikami.
      * 
-     * @param name - name to save in the file
+     * @param name - nazwa z jaka zapisac wynik
      */
-    public static void saveLeaderboardPosition(String name){
+    public static void saveLeaderboardPosition(String name) {
         var position = new LeaderboardPosition();
         position.Name = name;
         position.Score = GlobalReferenceManager.getScore();
         var leaderboard = getLeaderboard();
         leaderboard.add(position);
-        try{
+        try {
             FileOutputStream fout = new FileOutputStream(m_leaderboardFilename);
             ObjectOutputStream oos = new ObjectOutputStream(fout);
             oos.writeObject(leaderboard);
             oos.close();
             fout.close();
-        }catch
-        (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static ArrayList<LeaderboardPosition> getLeaderboard(){
-        if(m_leaderboardPositions == null){
-            try{
-            FileInputStream fin = new FileInputStream(m_leaderboardFilename);
-            ObjectInputStream ois = new ObjectInputStream(fin);
-            m_leaderboardPositions = (ArrayList<LeaderboardPosition>) ois.readObject();
-            ois.close();
-            fin.close();
-            }
-            catch(Exception e){
+    /**
+     * Metoda pozwala na wczytanie pliku z wynikami do pamieci. Nazwa pliku jest
+     * okreslona w polu klasy jako stala.
+     * 
+     * @return lista z najlepszymi wynikami, nieposortowana
+     */
+
+    public static ArrayList<LeaderboardPosition> getLeaderboard() {
+        if (m_leaderboardPositions == null) {
+            try {
+                FileInputStream fin = new FileInputStream(m_leaderboardFilename);
+                ObjectInputStream ois = new ObjectInputStream(fin);
+                m_leaderboardPositions = (ArrayList<LeaderboardPosition>) ois.readObject();
+                ois.close();
+                fin.close();
+            } catch (Exception e) {
                 m_leaderboardPositions = new ArrayList<>();
             }
         }
         return m_leaderboardPositions;
+    }
+
+    /**
+     * Metoda ustawia pacmana w tryb powerUp w ktorym moze zjadac duchy. Tryb
+     * trwa 10 sekund od zjedzenia ostatniego ulepszonego obiektu jadalnego.
+     */
+
+    public static void makePacmanPoweredUp() {
+        m_powerUps++;
+        pacMan.setPowerUp(true);
+        Debug.Log("Powerup on");
+        new java.util.Timer().schedule(new java.util.TimerTask() {
+            @Override
+            public void run() {
+                m_powerUps--;
+                if (m_powerUps == 0) {
+                    pacMan.setPowerUp(false);
+                    Debug.Log("Powerup off");
+                }
+            }
+        }, 10000);
     }
 }

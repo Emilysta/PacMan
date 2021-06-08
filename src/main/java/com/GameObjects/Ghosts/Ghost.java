@@ -12,19 +12,22 @@ import com.Utility.Vector2;
  */
 public class Ghost extends GameObject {
 
-    private GhostModeController m_ghostModeController;//kontroler ruchów konkretnego ducha
+    private GhostModeController m_ghostModeController;// kontroler ruchów konkretnego ducha
     private GhostMode m_ghostMode; // tryb, w którym duch się znajduje
-    private GhostController m_ghostController; //kontroler ruchów konkretnego ducha
-    private final Thread m_controllerThread; //wątek uruchamiający kontroler trybu konkretnego ducha
-    private final Thread m_controllerThread2; //wątek uruchamiający kontroler ruchów konkretnego ducha
-    private MoveDirection m_moveDirection = MoveDirection.None; //określa kierunek ruchu
+    private GhostController m_ghostController; // kontroler ruchów konkretnego ducha
+    private final Thread m_controllerThread; // wątek uruchamiający kontroler trybu konkretnego ducha
+    private final Thread m_controllerThread2; // wątek uruchamiający kontroler ruchów konkretnego ducha
+    private MoveDirection m_moveDirection = MoveDirection.None; // określa kierunek ruchu
+    private float m_speed = 2;
 
-    public Vector2 homePosition; //położenie domu na mapie
-    public GhostType m_ghostType; // określa typ ducha  - Blinky,Inky,Clyde,Pinky
+    public Vector2 homePosition; // położenie domu na mapie
+    public GhostType m_ghostType; // określa typ ducha - Blinky,Inky,Clyde,Pinky
 
     /**
-     * Konstruktor ducha, przypisuje mu odpowiednie zdjęcie oraz typ ducha, jakim jest
-     * @param sprite zdjęcie, które zostanie wyrednerowane
+     * Konstruktor ducha, przypisuje mu odpowiednie zdjęcie oraz typ ducha, jakim
+     * jest
+     * 
+     * @param sprite    zdjęcie, które zostanie wyrednerowane
      * @param ghostType dyo ducha - Blinky, Inky, Clyde, Pinky
      */
     public Ghost(Sprite sprite, GhostType ghostType) {
@@ -37,22 +40,22 @@ public class Ghost extends GameObject {
 
         switch (ghostType) {
             case Blinky: {
-                m_position = new Vector2(26*30,30);
+                m_position = new Vector2(26 * 30, 30);
                 m_ghostController = new BlinkyController(m_ghostModeController, this);
                 break;
             }
             case Inky: {
-                m_position=new Vector2(26*30,29*30);
+                m_position = new Vector2(26 * 30, 29 * 30);
                 m_ghostController = new InkyController(m_ghostModeController, this);
                 break;
             }
             case Clyde: {
-                m_position=new Vector2(30,29*30);
+                m_position = new Vector2(30, 29 * 30);
                 m_ghostController = new ClydeController(m_ghostModeController, this);
                 break;
             }
             case Pinky: {
-                m_position=new Vector2(120,30);
+                m_position = new Vector2(120, 30);
                 m_ghostController = new PinkyController(m_ghostModeController, this);
                 break;
             }
@@ -71,18 +74,20 @@ public class Ghost extends GameObject {
     }
 
     /**
-     *   Nadpisana metoda wywołująca się w każdej klatece gry, ustawia kierunek ruchu obiektu, oraz wywołuje metodę poruszania się
+     * Nadpisana metoda wywołująca się w każdej klatece gry, ustawia kierunek ruchu
+     * obiektu, oraz wywołuje metodę poruszania się
      */
     @Override
     protected void onUpdate() {
+        m_ghostMode = m_ghostModeController.ghostMode;
         m_moveDirection = m_ghostController.moveDirection;
-        //Debug.Log("Update duszka: " + m_moveDirection);
+        // Debug.Log("Update duszka: " + m_moveDirection);
         move();
     }
 
     /**
-     *  Nadpisana metoda wywołująca się przy zakończeniu gry, lub zniszczeniu obiektu
-     *  Kończy działanie wątków kontrolujących zachowanie obiektu
+     * Nadpisana metoda wywołująca się przy zakończeniu gry, lub zniszczeniu obiektu
+     * Kończy działanie wątków kontrolujących zachowanie obiektu
      */
     @Override
     protected void onExit() {
@@ -93,7 +98,7 @@ public class Ghost extends GameObject {
                 m_controllerThread.interrupt();
                 m_controllerThread2.interrupt();
                 m_controllerThread.join();
-                Debug.Log(m_ghostType+" mode controller dead");
+                Debug.Log(m_ghostType + " mode controller dead");
                 m_controllerThread2.join();
                 Debug.Log(m_ghostType + " controller dead");
             } catch (InterruptedException e) {
@@ -101,7 +106,7 @@ public class Ghost extends GameObject {
                 m_ghostController.shouldThreadExit.set(true);
                 m_controllerThread.interrupt();
                 m_controllerThread2.interrupt();
-                Debug.Log(m_ghostType+" mode controller interrupted");
+                Debug.Log(m_ghostType + " mode controller interrupted");
                 Debug.Log(m_ghostType + " controller interrupted");
             }
         }
@@ -112,18 +117,34 @@ public class Ghost extends GameObject {
      * Jeśli ruch jest niedozwolony, duch zatrzymuje się w miejscu.
      */
     private void move() {
+        checkSpeed();
+
         if (CollisionManager.checkIfMovePossible(m_position, m_moveDirection)) {
             if (m_moveDirection == MoveDirection.Up)
-                m_position.y -= 2;
+                m_position.y -= m_speed;
             else if (m_moveDirection == MoveDirection.Down)
-                m_position.y += 2;
+                m_position.y += m_speed;
             else if (m_moveDirection == MoveDirection.Right)
-                m_position.x += 2;
+                m_position.x += m_speed;
             else if (m_moveDirection == MoveDirection.Left)
-                m_position.x -= 2;
+                m_position.x -= m_speed;
         } else
             m_moveDirection = MoveDirection.None;
+    }
 
+    /**
+     * Metoda ustawia predkosc ducha w zaleznosci od jego trybu
+     */
+    private void checkSpeed() {
+        if (m_ghostMode == GhostMode.WanderingMode && m_speed == 2) {
+            m_speed = 1;
+            Debug.Log("speed = 1");
+        } else if (m_ghostMode != GhostMode.WanderingMode && m_speed == 1) {
+            if (m_position.x % 2 == 0 && m_position.y % 2 == 0) {
+                m_speed = 2;
+                Debug.Log("speed = 2");
+            }
+        }
     }
 
 }

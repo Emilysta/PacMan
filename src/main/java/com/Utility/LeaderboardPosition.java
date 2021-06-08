@@ -2,8 +2,7 @@ package com.Utility;
 
 import java.io.Serializable;
 /**
- * Serializable class to hold instances of player scores which should be saved
- * into file
+ * Serializowalna klasa pozwalajaca na przechowywanie wynikow w tabeli wynikow
  */
 public class LeaderboardPosition implements Serializable {
     public int Score;

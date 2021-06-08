@@ -20,13 +20,17 @@ public class LeaderboardController implements Initializable {
     @FXML
     private ListView<LeaderboardPosition> LeaderboardListView;
 
+    /**
+     * Metoda pozwala na powrocenie do głownego menu
+     * @param mouseEvent
+     */
     public void BackButtonClicked(MouseEvent mouseEvent) {
         Main.getInstance().goToMainWindow();
     }
 
     /**
-     * On initialization of window this method loads leaderboard from file,
-     * then sorts it by score;
+     * Podczas inicjalizacji okna, zostaje wczytana lista wynikow i posortowana
+     * wedlug wyniku. Nastepnie jest ona wyswietlona.
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

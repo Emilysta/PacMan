@@ -7,7 +7,8 @@ import javafx.scene.input.KeyCode;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Pacman helper class, running on separate thread
+ * Klasa kontrolujaca pacmana. Obsluguje interakcje z uzytkownikiem i powiadamia
+ * o potrzebie zmiany kierunku.
  */
 public class PacManController implements Runnable {
     public MoveDirection moveDirection = MoveDirection.None;
@@ -15,20 +16,21 @@ public class PacManController implements Runnable {
     public AtomicBoolean shouldThreadExit = new AtomicBoolean();
 
     /**
-     * Thread runs all the time, checking for key press of any of the arrows.
-     * Thread stops when the shouldThreadExit variable is set to true.
+     * Watek sprawdza czy ktorys z klawiszy zmiany kierunk zostal wcisniety. Watek
+     * konczy sie jesli zmienna shouldThreadExit zostanie ustawiona na true
      */
     @Override
     public void run() {
-        while (true){
+        while (true) {
             checkKeyPressed();
-            if(shouldThreadExit.get())
+            if (shouldThreadExit.get())
                 return;
         }
     }
+
     /**
-     * Method checks whether any of the arrow keys was pressed. If so, it sets
-     * the variable hasDirectionChanged to true and moves direction accordingly
+     * Metoda sprawdza czy ktorys z klawiszy zmiany kierunku zostal wcisniety. Jesli
+     * tak, ustawia odpowiednia zmienna w
      */
     private void checkKeyPressed() {
         if (InputManager.getInstance().isKeyPressed(KeyCode.UP)) {

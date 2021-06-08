@@ -1,6 +1,9 @@
 package com.UI;
 
 import com.Board.PathTypes;
+
+import java.util.Random;
+
 import com.Main;
 import com.Board.PredefinedBoard;
 import com.GameLoop.GameLoop;
@@ -8,20 +11,13 @@ import com.GameObjects.Coin.Coin;
 import com.GameObjects.Ghosts.Ghost;
 import com.GameObjects.Ghosts.GhostType;
 import com.GameObjects.PacMan.PacMan;
-import com.Utility.Debug;
 import com.Utility.GlobalReferenceManager;
-import com.Utility.LeaderboardPosition;
 import com.Utility.Sprite;
 
-import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -30,8 +26,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.util.Duration;
 
 public class BoardController {
 
@@ -51,6 +45,19 @@ public class BoardController {
 
     private boolean m_isInGame;
 
+    /**
+     * Metoda ustawia aktualny wynik gracza do wyswietlenia
+     * 
+     * @param score - wynik gracza
+     */
+    public void setScore(int score) {
+        scoreText.set("Score: " + score);
+    }
+
+    /**
+     * Metoda inicjalizująca nowa gre. Ustawia wszystkie potrzebne zmienne, wczytuje
+     * plansze, tworzy obiekty w grze i rozpoczyna glowna petle gry.
+     */
     public void initializeGame() {
         try {
             GlobalReferenceManager.clearData();
@@ -63,46 +70,29 @@ public class BoardController {
             m_mainGameLoop.setBoard(m_gameBoard);
             setUpGame();
             addVisuals();
-            blendCanvas.setStyle("-fx-background-color: rgba(1,0,0,0.2)");
-            blendCanvas.toFront();
-            goToMainWindowButton.setVisible(false);
-            tryAgainButton.setVisible(false);
-            tryAgainButton.toFront();
-            goToMainWindowButton.toFront();
-            blendCanvas.setMouseTransparent(true);
-            tryAgainButton.setOnAction(e -> {
-                tryAgainButton.setDisable(true);
-                goToMainWindowButton.setDisable(true);
-                tryAgainButton.setVisible(false);
-                goToMainWindowButton.setVisible(false);
-                blendCanvas.setVisible(false);
-                initializeGame();
-            });
-            goToMainWindowButton.setOnAction((event) -> Main.getInstance().goToMainWindow());
             m_isInGame = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void setScore(int score) {
-        scoreText.set("Score: " + score);
-    }
-
+    /**
+     * Metoda przerywa gre, wyswietla powiadomienie o zapisaniu wyniku do tablicy
+     * oraz daje wybór ponownego zagrania w gre, lub wyjscia do menu głownego
+     */
     public void loseGame() {
         if (m_isInGame) {
-            m_isInGame=false;
+            m_isInGame = false;
             m_mainGameLoop.stop();
             Platform.runLater(() -> {
                 var dialog = new TextInputDialog("User");
                 dialog.setTitle("Save highscore");
-                dialog.setHeaderText("Please enter your name for the leaderboard");
+                dialog.setHeaderText("Please enter your name for the leaderboard.\n Your score: "
+                        + GlobalReferenceManager.getScore());
                 dialog.setContentText("Leaderboard name:");
                 var result = dialog.showAndWait();
                 if (result.isPresent())
                     GlobalReferenceManager.saveLeaderboardPosition(result.get());
-                else
-                    GlobalReferenceManager.saveLeaderboardPosition("default");
                 mainCanvas.setMouseTransparent(true);
                 goToMainWindowButton.setVisible(true);
                 tryAgainButton.setVisible(true);
@@ -113,14 +103,24 @@ public class BoardController {
         }
     }
 
+    /**
+     * Metoda tworzy nowe obiekty do zjedzenia, pacmana oraz duchy i ustawia zmienne
+     * w glownej petli gry.
+     */
     private void setUpGame() {
+        var rand = new Random();
+        var powerUpsCount = 3;
         var x = 0;
         Sprite coin = new Sprite(new Image("/coin.png"), 20, 20);
+        Sprite power = new Sprite(new Image("/power.png"), 20, 20);
         for (int[] i : m_gameBoard.BoardsPaths) {
             var y = 0;
             for (int j : i) {
                 if (j == 1) {
-                    GlobalReferenceManager.Coins.add(new Coin(coin, y, x));
+                    if (rand.nextFloat() > 0.1f)
+                        GlobalReferenceManager.Coins.add(new Coin(coin, y, x, false));
+                    else
+                        GlobalReferenceManager.Coins.add(new Coin(power, y, x, true));
                 }
                 y++;
             }
@@ -136,10 +136,18 @@ public class BoardController {
         m_mainGameLoop.start();
     }
 
+    /**
+     * Metoda wczytuje nowa plansze z losowego pliku.
+     */
     private void setUpBoard() {
         m_gameBoard.loadFromFile(PredefinedBoard.randFile());
     }
 
+    /**
+     * Metoda uklada odpowiednie grafiki na planszy.
+     * 
+     * @throws Exception jesli plik nie zostanie znaleziony
+     */
     private void openBoard() throws Exception {
         BoardGridPane.setStyle("-fx-background-color: #000000;");
         String filePath = "/";
@@ -154,9 +162,28 @@ public class BoardController {
         }
     }
 
+    /**
+     * Metoda dodaje wizualne elementy na scenie.
+     */
     private void addVisuals() {
         Label lbl = new Label();
         BoardGridPane.add((lbl), 0, 32, 12, 1);
         lbl.textProperty().bind(scoreText);
+        blendCanvas.setStyle("-fx-background-color: rgba(1,0,0,0.2)");
+        blendCanvas.toFront();
+        goToMainWindowButton.setVisible(false);
+        tryAgainButton.setVisible(false);
+        tryAgainButton.toFront();
+        goToMainWindowButton.toFront();
+        blendCanvas.setMouseTransparent(true);
+        tryAgainButton.setOnAction(e -> {
+            tryAgainButton.setDisable(true);
+            goToMainWindowButton.setDisable(true);
+            tryAgainButton.setVisible(false);
+            goToMainWindowButton.setVisible(false);
+            blendCanvas.setVisible(false);
+            initializeGame();
+        });
+        goToMainWindowButton.setOnAction((event) -> Main.getInstance().goToMainWindow());
     }
 }

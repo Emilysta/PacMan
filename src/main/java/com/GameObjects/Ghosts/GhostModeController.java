@@ -1,8 +1,8 @@
 package com.GameObjects.Ghosts;
 
 import com.GameLoop.CollisionManager;
+import com.Utility.Debug;
 import com.Utility.GlobalReferenceManager;
-import com.Utility.MoveDirection;
 
 import javafx.application.Platform;
 
@@ -21,6 +21,7 @@ public class GhostModeController implements Runnable {
 
     /**
      * Konstruktor klasy, przypisuje odpowiedniego ducha do swojego pola
+     * 
      * @param ghost - duch,dla którego wątek będzie Mode Controllerem
      */
     public GhostModeController(Ghost ghost) {
@@ -46,18 +47,24 @@ public class GhostModeController implements Runnable {
      * Metoda sprawdzająca, w jakim trybie powinien znajdować się duszek
      */
     public void checkMode() {
-        ghostMode = GhostMode.ChaseMode;
-        if (GlobalReferenceManager.pacMan.isPacmanPoweredUp()) {
-            ghostMode = GhostMode.WanderingMode;
-        }
-        if (CollisionManager.checkIfCollisionWithPacMan(m_ghost.getPosition())) {
+        if (ghostMode != GhostMode.DeadMode) {
+            ghostMode = GhostMode.ChaseMode;
             if (GlobalReferenceManager.pacMan.isPacmanPoweredUp()) {
-                ghostMode = GhostMode.DeadMode;
-            } else {
-                Platform.runLater(() -> GlobalReferenceManager.boardController.loseGame());
-
+                ghostMode = GhostMode.WanderingMode;
+            }
+            if (CollisionManager.checkIfCollisionWithPacMan(m_ghost.getPosition())) {
+                if (GlobalReferenceManager.pacMan.isPacmanPoweredUp()) {
+                    ghostMode = GhostMode.DeadMode;
+                    Debug.Log(m_ghost.m_ghostType.toString() + " mode:" + ghostMode.toString());
+                } else {
+                    Platform.runLater(() -> GlobalReferenceManager.boardController.loseGame());
+                }
+            }
+        } else {
+            if (m_ghost.getPosition().equals(m_ghost.homePosition.multiply(30))) {
+                ghostMode = GhostMode.ChaseMode;
+                Debug.Log(m_ghost.m_ghostType.toString() + " mode:" + ghostMode.toString());
             }
         }
-        // ToDo distract mode
     }
 }

@@ -8,8 +8,8 @@ import com.Utility.Sprite;
 import com.Utility.Vector2;
 
 /**
- * Class represents the pac man in the game world
- * Class extend the GameObject class to be included in the main gameLoop
+ * Klasa reprezentuje pacMana w swiecie gry.
+ * Klasa dziedzczy po klasie GameObject w celu bycia dodanym do glownej petli gry.
  */
 public class PacMan extends GameObject {
     private final PacManController m_controller;
@@ -21,8 +21,8 @@ public class PacMan extends GameObject {
     private MoveDirection m_moveDirection = MoveDirection.None;
 
     /**
-     * Creates a new pacman with the given sprite
-     * @param sprite - image to show pacman as
+     * Tworzy nowego pacmana
+     * @param sprite - sprite jakim nalezy wyswietlac pacmana
      */
     public PacMan(Sprite sprite) {
         super(sprite);
@@ -39,17 +39,24 @@ public class PacMan extends GameObject {
     {
         return m_moveDirection;
     }
+    /**
+     * Metoda pozwala na ustawienie zmiennej odpowiedzialnej za powerUp
+     * @param value - true jesli ma byc poweredUp, false inaczej
+     */
+    public void setPowerUp(boolean value){
+        m_isSuperPower = value;
+    }
 
     /**
-     * Method checks whether pacman has eaten a special coin
-     * @return true if pacman is powered up, false otherwise
+     * Metoda sprawdza czy pacMan zjadl power up
+     * @return true jesli pacman jest poweredUp, false inaczej
      */
     public boolean isPacmanPoweredUp(){
         return m_isSuperPower;
     }
 
     /**
-     * Method starts the separate thread by which pacman is controlled
+     * Metoda rozpoczyna watek kontrolera pacMana
      */
     @Override
     protected void onStart() {
@@ -58,8 +65,8 @@ public class PacMan extends GameObject {
     }
 
     /**
-     * Method check wheter user tried to change direction, if so it checks the
-     * possibility of that move and moves the pacman in the game world if possible
+     * Metoda sprawdza, czy gracz chcial zmienic kierunek ruchu, jesli tak to
+     * proboje to zrobic
      */
     @Override
     protected void onUpdate() {
@@ -70,7 +77,7 @@ public class PacMan extends GameObject {
     }
 
     /**
-     * Method stops the controller thread before exiting
+     * Metoda zatrzymuje watek kontrolera przed wyjsciem
      */
     @Override
     protected void onExit() {
@@ -85,9 +92,9 @@ public class PacMan extends GameObject {
     }
 
     /**
-     * Method checks wheter the move is possible 
-     * @param moveDirection - direction in which to try the move
-     * @return true if possible, false otherwise
+     * Metoda sprawdza czy dany ruch jest mozliwy do wykonania
+     * @param moveDirection - kierunek ruchu
+     * @return true jesli mozliwy, false inaczej
      */
     private boolean tryMove(MoveDirection moveDirection) {
         if (CollisionManager.checkIfMovePossible(m_position, moveDirection)) {
@@ -116,8 +123,8 @@ public class PacMan extends GameObject {
     }
 
     /**
-     * Method moves pacman in the gameWorld according to it's current move
-     * direction. If move is illegal, it stops pacman in place.
+     * Metoda przesuwa PacMana w swiecie gry. Jesli ruch jest niedozwolony,
+     * zatrzymuje pacmana w miejscu.
      */
     private void move() {
         if (CollisionManager.checkIfMovePossible(m_position, m_moveDirection)) {

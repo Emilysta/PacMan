@@ -14,9 +14,8 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 /**
- * Main class managing the applicaiton visuals Implements a singleton pattern,
- * for possibility of retrievieng main stage as well as changing the current
- * scene from scene controllers
+ * Glowna klasa aplikacji, zarzadzajaca aktualna scena. Implementuje wzorzec
+ * singletona, w celu mozliwosci zmiany aktualnie wyswietlanej sceny.
  */
 public class Main extends Application {
 
@@ -28,38 +27,38 @@ public class Main extends Application {
     }
 
     /**
-     * Singleton pattern methdo to retrieve the current instance of class
+     * metoda zwracajaca singleton
      * 
-     * @return Main - current singleton instance of class Main
+     * @return Main - aktualncja instancja klasy
      */
     public static Main getInstance() {
         return m_instance;
     }
 
     /**
-     * Main method in program - launches the javaFX application with given arguments
+     * Glowna metoda programu - wywoluje odpalanie UI JavaFX
      * 
-     * @param args - command line arguments
+     * @param args - argumenty lini komend
      */
     public static void main(String[] args) {
         launch(args);
     }
 
     /**
-     * Method allows to retrieve current stage.
+     * Metoda zwraca aktualny stage
      * 
-     * @return Stage - current active stage
+     * @return Stage - aktywny stage
      */
     public Stage getStage() {
         return m_mainStage;
     }
 
     /**
-     * Overridden method from javaFX application class. Method starts the
-     * application with primary stage being MainWindoww
+     * Nadpisana metoda z JavaFX. Jest wywołana na poczatku aplikacji, i laduje
+     * ekran MainWindow oraz ikone.
      * 
-     * @param primaryStage - the stage the application starts on
-     * @throws IOException - if MainWindow.fxml is not found
+     * @param primaryStage - stage na ktorym aplikacja rozpoczyna prace
+     * @throws IOException - jestli MainWindow.fxml nie znajduje sie w aplikacji.
      */
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -74,7 +73,7 @@ public class Main extends Application {
     }
 
     /**
-     * Method gets called when the application exits safely by user input
+     * Metoda wywoluje sie przy kazdym wyjsciu aplikacji
      */
     @Override
     public void stop() {
@@ -82,7 +81,7 @@ public class Main extends Application {
     }
 
     /**
-     * Method to stop the current application, and exit completely
+     * Metoda pozwala na reczne wyjscie z aplikacji
      */
     public void exit() {
         GameLoop.getInstance().stop();
@@ -90,7 +89,7 @@ public class Main extends Application {
     }
 
     /**
-     * Method allowing to switch the current stage to MainWindow scene
+     * Metoda pozwala na zmiane aktualnej sceny na MainWindow
      */
     public void goToMainWindow() {
         try {
@@ -101,7 +100,7 @@ public class Main extends Application {
     }
 
     /**
-     * Method allowing to switch the current stage to Leaderboard scene
+     * Metoda pozwala na zmiane aktualnej sceny na Leaderboard
      */
     public void goToLeaderboard() {
         try {
@@ -110,9 +109,8 @@ public class Main extends Application {
             e.printStackTrace();
         }
     }
-
     /**
-     * Method allowing to switch the current stage to Game scene
+     * Metoda pozwala na zmiane aktualnej sceny na scene z gra
      */
     public void goToBoard() {
         try {
@@ -123,16 +121,12 @@ public class Main extends Application {
     }
 
     /**
-     * Flexible method allowing to change current scene into one defined in
-     * <p>
-     * fxml
-     * <p>
-     * parameter.
+     * Metoda pozwala na zmiane sceny na dowolna, okreslona przez sciezkie pliku.
      * 
-     * @param fxml   - scene filename
-     * @param width  - scene width
-     * @param height - scene height
-     * @throws Exception - if fxml is not found
+     * @param fxml   - plik fxml ze scena
+     * @param width  - szerokosc sceny
+     * @param height - wysokosc sceny
+     * @throws Exception - jesli plik fxml nie zostanie znaleziony
      */
     private void replaceSceneContent(String fxml, double width, double height) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(fxml));

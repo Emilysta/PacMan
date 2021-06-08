@@ -3,7 +3,7 @@ package com.Utility;
 import javafx.scene.image.Image;
 
 /**
- * Class represents an in-game sprite object to render
+ * Klasa reprezentujaca sprite'a ktory moze zostac wyswietlony na scenie
  */
 public class Sprite {
     public Image spriteImage;

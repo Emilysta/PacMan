@@ -1,7 +1,6 @@
 package com.GameLoop;
 
 import com.Main;
-import com.Utility.Debug;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -9,8 +8,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Global class managing user input
- * Implements singleton pattern
+ * Klasa zarzada wciskaniem klawiszy przez uzytkownika. Implementuje wzorzec
+ * singletona w celu mozliwego dostepu z kazdego miejsca.
  */
 public class InputManager {
     private static InputManager m_instance;
@@ -20,9 +19,10 @@ public class InputManager {
     private int m_counter = 0;
 
     /**
-     * Private constructor implements singleton pattern
-     * Input manager adds an event filter into the main stage which takes the
-     * given key and inserts it into the input list
+     * Prywatny konstruktor pozwala na implementacje wzorca singletona.
+     * Tworzona jest lista, dostępna z poziomu wielu wątków oraz dodawany jest
+     * EventFilter przechwytujacy wszystkie wcisniete klawisze, i dodajacy je do
+     * listy jesli jeszcze ich tam nie ma.
      */
     private InputManager() {
         m_inputList = new ConcurrentLinkedQueue<>();
@@ -34,7 +34,8 @@ public class InputManager {
     }
 
     /**
-     * @return singleton instance
+     * Metoda zwraca instancje singletonu. Jesli nie istnieje, tworzy nowa i ja zwraca.
+     * @return  instancja singletonu
      */
     public static InputManager getInstance() {
         if (m_instance == null) {
@@ -43,21 +44,20 @@ public class InputManager {
         return m_instance;
     }
     /**
-     * Method ends the current frame input capturing
+     * Metoda konczy przechwytywanie klawiszy w aktualnej klatce.
+     * Co 5 klatek lista jest czyszczona z klawiszy.
      */
     public void endFrame() {
         m_counter++;
         if (m_counter / 5 == 0) {
-            for (KeyEvent k : m_inputList)
-                //Debug.Log("Key clicked: " + k.getCode());
             m_inputList.clear();
             m_counter=0;
         }
     }
     /**
-     * Method allows to check whether a key was pressed during the last n frames
-     * @param keyCode - key to check for
-     * @return true if key was pressed, false otherwise
+     * Metoda pozwala na sprawdzenie czy dany klawisz zostal wcisniety
+     * @param keyCode - klawisz, ktory powinien byc nacisniety
+     * @return true jesli klawisz byl nacisniety, false inaczej
      */
     public boolean isKeyPressed(KeyCode keyCode) {
         return m_inputList.stream().anyMatch(x -> x.getCode() == keyCode);

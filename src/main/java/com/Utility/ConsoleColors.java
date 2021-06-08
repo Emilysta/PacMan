@@ -1,7 +1,7 @@
 package com.Utility;
 
 /**
- * Utility class holding all possible console colors
+ * Klasa pomocnicza przechowujaca wszystkie mozliwe kolory do wyswietlenia w konsoli
  */
 public class ConsoleColors {
     // Reset

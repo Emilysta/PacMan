@@ -7,15 +7,15 @@ import com.Utility.Vector2;
 import static java.lang.Math.abs;
 
 /**
- * CollisionManager class is responsible for checking whether a move is possible
- * to complete. It doesn't need any local variables.
+ * Klasa odpowiada za sprawdzanie kolizji obiektów ze ścianami oraz z samymi
+ * sobą na scenie.
  */
 public class CollisionManager {
     /**
-     * Method checks if move is possible
-     * @param position - Vector2 of position on screen
-     * @param moveDirection - Move direction in which we check collision
-     * @return True if move is possible, false otherwise
+     * Metoda sprawdza czy dany ruch jest możliwy do wykonania na scenie
+     * @param position - Vector2 pozycji na ekranie
+     * @param moveDirection - Kierunek ruchu w którym sprawdzany jest ruch
+     * @return true jeśli można się ruszyć, inaczej false
      */
     public static boolean checkIfMovePossible(Vector2 position, MoveDirection moveDirection) {
         int gridX = (int) position.x / 30;
@@ -50,6 +50,12 @@ public class CollisionManager {
             return position.y % 30 < 1;
         return false;
     }
+
+    /**
+     * Metoda sprawdza czy aktualnie występuja kolizja ducha z pacmanem
+     * @param ghostPosition - Vector2 pozycji ducha na ekranie
+     * @return true jeśli występuje kolizja, false inaczej
+     */
 
     public static boolean checkIfCollisionWithPacMan(Vector2 ghostPosition){
         Vector2 pacmanPosition = GlobalReferenceManager.pacMan.getPosition();

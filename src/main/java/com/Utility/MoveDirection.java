@@ -1,7 +1,8 @@
 package com.Utility;
 
 /**
- * Enum represents all possible move directions of moving gameObjects
+ * 
+ * Enum reprezentujacy mozliwe kierunki ruchu
  */
 public enum MoveDirection {
     None,

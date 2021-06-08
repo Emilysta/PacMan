@@ -3,7 +3,7 @@ package com.GameLoop;
 import com.GameObjects.GameObject;
 import javafx.scene.canvas.GraphicsContext;
 /**
- * Class responsible for rendering gameObjects onto game canvas
+ * Klasa odpowiada za renderowanie gameObjectow na canvas.
  */
 public class Renderer {
     private GraphicsContext m_graphicsContext;
@@ -11,10 +11,10 @@ public class Renderer {
     private double m_canvasHeight;
 
     /**
-     * Creates a new Renderer class
-     * @param graphicsContext - where to render gameObjects
-     * @param width - canvas width
-     * @param height - canvas height
+     * Tworzy nowa klase Renderer
+     * @param graphicsContext - context na ktorym renderowac GameObjecty
+     * @param width - szerokosc canvas
+     * @param height - wysokosc canvas
      */
     public Renderer(GraphicsContext graphicsContext, double width, double height) {
         m_graphicsContext = graphicsContext;
@@ -22,14 +22,14 @@ public class Renderer {
         m_canvasHeight = height;
     }
     /**
-     * Method clears the whole canvas of any rendered objects
+     * Metoda czysci canvas ze wszystkich narysowanych rzeczy
      */
     public void prepareScene() {
         m_graphicsContext.clearRect(0, 0, m_canvasWidth, m_canvasHeight);
     }
     /**
-     * Method draws an object in it's position
-     * @param gameObject - object to render on the board
+     * Metoda pozwala na rysowanie gameObjectu na jego pozycji
+     * @param gameObject - obiekt do wyrenderowania
      */
     public void renderObject(GameObject gameObject) {
         m_graphicsContext.drawImage(gameObject.objectSprite.spriteImage,

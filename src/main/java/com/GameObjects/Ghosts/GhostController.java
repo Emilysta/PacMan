@@ -12,8 +12,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Klasa bazowa dla kontrolerów poszczególnych duchów, klasa działa jako osobny wątek i
- * sprawdza ruchy do wykonania
+ * Klasa bazowa dla kontrolerów poszczególnych duchów, klasa działa jako osobny
+ * wątek i sprawdza ruchy do wykonania
  */
 public abstract class GhostController implements Runnable {
     public AtomicBoolean shouldThreadExit = new AtomicBoolean();
@@ -27,7 +27,6 @@ public abstract class GhostController implements Runnable {
     private GhostMode m_GhostMode;
     private boolean isGoingHome = false;
 
-
     public GhostController(GhostModeController ghostModeController, Ghost ghost) {
         m_ghostModeController = ghostModeController;
         m_ghost = ghost;
@@ -35,10 +34,10 @@ public abstract class GhostController implements Runnable {
     }
 
     /**
-     * Metoda wywoływana wraz z uruchomieniem wątku, metoda sprawdza,
-     * w jakim trybie znajdyje się duch i w zależności od tego
-     * wywyołuje odpowiednią metodę znajdującą ścieżkę.
-     * Dodatkowo w zależności od trybu ustawia odpowiednie zdjęcie do renderowania dla odpowiedniego ducha
+     * Metoda wywoływana wraz z uruchomieniem wątku, metoda sprawdza, w jakim trybie
+     * znajdyje się duch i w zależności od tego wywyołuje odpowiednią metodę
+     * znajdującą ścieżkę. Dodatkowo w zależności od trybu ustawia odpowiednie
+     * zdjęcie do renderowania dla odpowiedniego ducha
      */
     @Override
     public void run() {
@@ -46,8 +45,7 @@ public abstract class GhostController implements Runnable {
             while (true) {
                 if (shouldThreadExit.get())
                     return;
-                //m_GhostMode = m_ghostModeController.ghostMode; //toDo podmiana na to
-                m_GhostMode = GhostMode.ChaseMode;
+                m_GhostMode = m_ghostModeController.ghostMode; // toDo podmiana na to
                 String whichGhost = "";
                 switch (m_ghost.m_ghostType) {
                     case Blinky:
@@ -64,7 +62,7 @@ public abstract class GhostController implements Runnable {
                 }
                 switch (m_GhostMode) {
                     case WanderingMode: {
-                        m_ghost.setSprite(new Sprite(new Image(whichGhost), 30, 30));
+                        m_ghost.setSprite(new Sprite(new Image("/dead.png"), 30, 30));
                         wanderingMode();
                         break;
                     }
@@ -73,7 +71,6 @@ public abstract class GhostController implements Runnable {
                         distractMode();
                         break;
                     }
-                    // toDo to check
                     case ChaseMode: {
                         m_ghost.setSprite(new Sprite(new Image(whichGhost), 30, 30));
                         chaseMode();
@@ -96,7 +93,7 @@ public abstract class GhostController implements Runnable {
                         shouldThreadExit.set(true);
                     }
                 } else if (m_steps.size() == 0)
-                    ;//deadMode();
+                    ;// deadMode();
                 else {
                     Vector2 positionToReach = m_steps.get(m_steps.size() - 1);
                     Vector2 myPosition = new Vector2(m_ghost.getPosition().x, m_ghost.getPosition().y);
@@ -129,18 +126,24 @@ public abstract class GhostController implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Debug.Log("Wyjscie kontrolera chodzenia od " + m_ghost.m_ghostType.toString());
     }
 
     /**
-     * Metoda do nadpisania w klasach dziedziczących, metoda wywoływana w momencie gdy duch jest w trybie Chase.
+     * Metoda do nadpisania w klasach dziedziczących, metoda wywoływana w momencie
+     * gdy duch jest w trybie Chase.
      */
     public abstract void chaseMode();
+
     /**
-     * Metoda do nadpisania w klasach dziedziczących, metoda wywoływana w momencie gdy duch jest w trybie Scatter.
+     * Metoda do nadpisania w klasach dziedziczących, metoda wywoływana w momencie
+     * gdy duch jest w trybie Scatter.
      */
     public abstract void distractMode();
+
     /**
-     * Metoda określająca ruchy ducha w trybie wędrowania - gdy Pac-Man jest w trybie Power-Up.
+     * Metoda określająca ruchy ducha w trybie wędrowania - gdy Pac-Man jest w
+     * trybie Power-Up.
      */
     public void wanderingMode() {
         if (shouldThreadExit.get())
@@ -153,8 +156,10 @@ public abstract class GhostController implements Runnable {
             m_lastUpdate = System.nanoTime();
         }
     }
+
     /**
-     * Metoda określająca ruchy ducha, gdy umarł, wyszukuje najkrótszą ścieżkę do domu.
+     * Metoda określająca ruchy ducha, gdy umarł, wyszukuje najkrótszą ścieżkę do
+     * domu.
      */
     public void deadMode() {
         if (!isGoingHome) {
@@ -162,8 +167,10 @@ public abstract class GhostController implements Runnable {
             isGoingHome = true;
         }
     }
+
     /**
      * Metoda określająca czy wartości x i y zawierają się w rozmiarze planszy
+     * 
      * @return true - jeśli wartości są w zakresie, false w przeciwnym razie
      */
     public boolean isCellInRange(int x, int y) {
@@ -171,14 +178,17 @@ public abstract class GhostController implements Runnable {
             return true;
         return false;
     }
+
     /**
-     * Metoda znajdująca najkrótszą ścieżkę do danego punktu na mapie, z miejsca, w którym duch się znajduje
+     * Metoda znajdująca najkrótszą ścieżkę do danego punktu na mapie, z miejsca, w
+     * którym duch się znajduje
+     * 
      * @return zwraca listę punktów do, których Pac-Man ma się przemieścić
      */
     public List<Vector2> findPathToPoint(Vector2 point) {
         Vector2 targetPosition = new Vector2((int) point.x, (int) point.y);
         Vector2 myPosition = new Vector2((int) m_ghost.getPosition().x / 30, (int) m_ghost.getPosition().y / 30);
-        //Debug.LogError(myPosition + "->"+targetPosition);
+        // Debug.LogError(myPosition + "->"+targetPosition);
         if (targetPosition.equals(myPosition))
             return new ArrayList<>();
         int[][] boardsPaths = GameLoop.getInstance().gameBoard.BoardsPaths;
@@ -190,7 +200,7 @@ public abstract class GhostController implements Runnable {
         Queue<queueNode> queue = new LinkedList<>();
         queueNode start = new queueNode(myPosition, 0);
         queue.add(start);
-        Vector2[] neighbourhood = {new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0)};
+        Vector2[] neighbourhood = { new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0) };
         int[][] distances = new int[31][28];
         while (!queue.isEmpty()) {
             queueNode current = queue.remove();
@@ -235,14 +245,17 @@ public abstract class GhostController implements Runnable {
         }
         return new ArrayList<>();
     }
+
     /**
      * Metoda znajdująca współrzędne punktu znajdującego się przed Pac-Manem
+     * 
      * @return współrzędne punktu znajdującego się przed Pac-Manem
      */
     protected Vector2 find2DotsTowardsPacMan() {
         Vector2 targetPoint = new Vector2();
         MoveDirection pacManMoveDirection = GlobalReferenceManager.pacMan.getMoveDirection();
-        Vector2 pacManPosition = new Vector2((int) GlobalReferenceManager.pacMan.getPosition().x / 30, (int) GlobalReferenceManager.pacMan.getPosition().y / 30);
+        Vector2 pacManPosition = new Vector2((int) GlobalReferenceManager.pacMan.getPosition().x / 30,
+                (int) GlobalReferenceManager.pacMan.getPosition().y / 30);
 
         int[][] board = GameLoop.getInstance().gameBoard.BoardsPaths;
         Vector2 moveDirectionInBoard = new Vector2();
@@ -279,11 +292,13 @@ public abstract class GhostController implements Runnable {
             if (board[positionToMoveX2][positionToMoveY2] == 1)
                 targetPoint = new Vector2(positionToMoveY, positionToMoveX);
         }
-        //Debug.Log("Pinky target x: "+targetPoint.x + "y: "+targetPoint.y);
+        // Debug.Log("Pinky target x: "+targetPoint.x + "y: "+targetPoint.y);
         return targetPoint;
     }
+
     /**
      * Metoda losująca współrzędne punktu znajdującego w danym zakresie/okręgu
+     * 
      * @return współrzędne wylosowanego punktu
      */
     protected Vector2 randPointInRange() {
@@ -292,14 +307,15 @@ public abstract class GhostController implements Runnable {
         int myPositionX = (int) myPosition.y;
         int myPositionY = (int) myPosition.x;
         int board[][] = GameLoop.getInstance().gameBoard.BoardsPaths;
-        //(x-a)^2 + (y-b)^2 = r^2 gdzie (a,b) to środek - pozycja ducha i r to promień
+        // (x-a)^2 + (y-b)^2 = r^2 gdzie (a,b) to środek - pozycja ducha i r to promień
         List<Vector2> localOnes = GameLoop.getInstance().gameBoard.onesList;
         int sizeOfOnesList = localOnes.size();
         int index = ThreadLocalRandom.current().nextInt(0, sizeOfOnesList);
         int x = (int) localOnes.get(index).x;
         int y = (int) localOnes.get(index).y;
-        while (((Math.pow(x - myPositionX, 2) + Math.pow(y - myPositionY, 2)) >= Math.pow(randMax, 2)) &&
-                ((Math.pow(x - myPositionX, 2) + Math.pow(y - myPositionY, 2)) <= Math.pow(randMin, 2)) && x == myPositionX && y == myPositionY) {
+        while (((Math.pow(x - myPositionX, 2) + Math.pow(y - myPositionY, 2)) >= Math.pow(randMax, 2))
+                && ((Math.pow(x - myPositionX, 2) + Math.pow(y - myPositionY, 2)) <= Math.pow(randMin, 2))
+                && x == myPositionX && y == myPositionY) {
             if (shouldThreadExit.get())
                 return null;
             index = ThreadLocalRandom.current().nextInt(0, sizeOfOnesList);
@@ -311,6 +327,7 @@ public abstract class GhostController implements Runnable {
 
         return newPoint;
     }
+
     /**
      * Klasa pomocnicza w znajdywaniu najkrótszej ścieżki
      */

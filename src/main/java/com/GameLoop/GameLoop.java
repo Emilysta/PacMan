@@ -9,10 +9,11 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Main GameLoop class, running on a thread separate from the UI.
- * GameLoop class implements a singleton pattern to make sure it is only run
- * once in the whole project. It implements observer design pattern, notifying
- * all GameObjects when the game starts and updates every frame.
+ * Klasa odpowiada za tworzenie głównego wątku gry. Klasa implementuje wzorzec
+ * projektowy singletona, tak aby w każdym miejscu można było się odwołać do
+ * jednej wspólnej instancji klasy. Klasa jest również miejscem synchronizacji
+ * dla wszystkich obiektów klasy GameObject. Odpowiada za wywoływanie metod co
+ * klatkę w każdym obiekcie GameObject.
  */
 public class GameLoop implements Runnable {
 
@@ -31,16 +32,15 @@ public class GameLoop implements Runnable {
         m_listeners = new ConcurrentLinkedQueue<>();
     }
 
-    public boolean isGameRunning(){
+    public boolean isGameRunning() {
         return m_isGamePlaying;
     }
 
     /**
-     * Method returns the singleton instance of the main GameLoop object.
-     * If the instance hasn't been created yet, it invokes it's constructor
-     * and return the new instance
+     * Metoda zwraca instancje singletona klasy GameLoop. Jeśli taka instancja nie
+     * istnieje, wywołuje konstruktor i zwraca nowy obiekt.
      *
-     * @return GameLoop - singleton instance
+     * @return GameLoop - instancja singletonu klasy GameLoop
      */
     public static GameLoop getInstance() {
         if (m_instance == null) {
@@ -50,26 +50,26 @@ public class GameLoop implements Runnable {
     }
 
     /**
-     * Method implements observer design pattern to allow for sync of all
-     * GameObjects in the game.
+     * Metoda pozwalająca na implementacje wzorca obserwatora dla klas GameObject.
      *
-     * @param gameObject - gameObject to be added as a listener to MainLoop update.
+     * @param gameObject - gameObject który ma zostać dodany do listy obserwatorów.
      */
     public void addListener(GameObject gameObject) {
         if (!m_listeners.contains((gameObject))) {
             m_listeners.add(gameObject);
         }
-        if(m_isGamePlaying)
+        if (m_isGamePlaying)
             gameObject.start();
     }
+
     /**
-     * Method removes a gameObject from the gameLoop listeners, essentialy
-     * removing it from the game.
-     * @param gameObject - gameObject to remove from listeners and gameloop
-     * @return true if object was removed, false otherwise
+     * Metoda pozwala na usunięcie klasy GameObject z list obserwatorów oraz z gry.
+     * 
+     * @param gameObject - gameObject, który ma zostac usuniety z listy
+     * @return true jesli został usuniety, false inaczej
      */
 
-    public boolean removeListener(GameObject gameObject){
+    public boolean removeListener(GameObject gameObject) {
         if (m_listeners.contains((gameObject))) {
             m_listeners.remove(gameObject);
             return true;
@@ -78,26 +78,29 @@ public class GameLoop implements Runnable {
     }
 
     /**
-     * Method sets the graphicContext on which all gameObjects will be rendered
-     * @param graphicsContext - canvas context on which to render
+     * Metoda ustawia graphicContext na ktorym wszystkie gameObject bedą
+     * 
+     * @param graphicsContext - graphicsContext canvas'u na ktorym renderowac
+     *                        obiekty
      */
     public void setGraphicContext(GraphicsContext graphicsContext, double width, double height) {
-        m_mainRenderer = new Renderer(graphicsContext,width,height);
+        m_mainRenderer = new Renderer(graphicsContext, width, height);
     }
 
     /**
-     * Method sets the current board on which the game is being played
-     * @param board PredefinedBoard with parameters
+     * Metoda ustawia aktualna plansze na ktorej odbywa sie gra
+     * 
+     * @param board - aktualna plansza
      */
-    public void setBoard(PredefinedBoard board){
+    public void setBoard(PredefinedBoard board) {
         gameBoard = board;
     }
 
     /**
-     * Public method created for the Runnable interface.
-     * To run on separate thread, create a new Thread from the
-     * GameLoop instance and invoke start() method.
-     * Warning - this method runs on the main thread.
+     * Metoda stworzona dla interfejsu Runnable. Implementuje pelna petle gry, z
+     * wywołaniem metod update oraz renderowania obiektow na scenie. Bezpośrednie
+     * uruchomienie metody powoduje działanie na głownym watku. W celu poprawnego
+     * uruchomienia klasy na osobnym watku nalezy uzyc metody start
      */
     @Override
     public void run() {
@@ -109,6 +112,7 @@ public class GameLoop implements Runnable {
         while (m_isGamePlaying) {
             long lastLoopTime = System.nanoTime();
             playOneFrame(frameTime, lastLoopTime);
+            /*
             second += System.nanoTime() - lastLoopTime;
             fps += 1;
             if (second >= 1000000000) {
@@ -116,12 +120,12 @@ public class GameLoop implements Runnable {
                 fps = 0;
                 second = 0;
             }
+            */
         }
     }
 
     /**
-     * Creates a new thread on which the gameLoop is run.
-     * Use this over run() to run on separate thread.
+     * Metoda tworzy nowy watek na ktorym dziala glowna petla gry.
      */
     public void start() {
         stop();
@@ -133,7 +137,8 @@ public class GameLoop implements Runnable {
     }
 
     /**
-     * Stops the running GameLoop and joins it's thread.
+     * Metoda zatrzymuje aktualnie dzialajaca petle gry, i zabija wszystkie
+     * przynalezne watki.
      */
     public void stop() {
         m_isGamePlaying = false;
@@ -148,49 +153,64 @@ public class GameLoop implements Runnable {
             }
         }
         stopAllGameObjects();
-        m_mainThread=null;
+        m_mainThread = null;
     }
+
     /**
-     * Clears all data to prepare for new game
+     * Metoda czysci wszystkie dane, w przygotowaniu na kolejna gre
      */
-    public void clearData(){
+    public void clearData() {
         m_listeners.clear();
         gameBoard = null;
         m_mainRenderer = null;
     }
 
     /**
-     * Method updates all gameObjects and renders them on screen according to
-     * their positions
-     * @param frameTime - time which one frame should take to complete
-     * @param lastLoopTime - time at which the last frame has ended
+     * Metoda wywoluje update we wszystkich gameObject'ach, nastepnie je wszystkie
+     * renderuje na zadanym canvas.
+     * 
+     * @param frameTime    - optymalny czas jednej klatki
+     * @param lastLoopTime - czas zakonczenia ostatniej klatki
      */
     private void playOneFrame(long frameTime, long lastLoopTime) {
         updateAllGameObjects();
         renderGameObjects();
         inputManager.endFrame();
-        while (System.nanoTime() < lastLoopTime + frameTime) ;
+        while (System.nanoTime() < lastLoopTime + frameTime)
+            ;
     }
 
+    /**
+     * Metoda wywoluje start we wszystkich gameObject'ach
+     */
     private void startAllGameObjects() {
         for (GameObject gameObject : m_listeners)
             gameObject.start();
     }
 
+    /**
+     * Metoda wywoluje update we wszystkich gameObject'ach
+     */
     private void updateAllGameObjects() {
         for (GameObject gameObject : m_listeners)
             gameObject.update();
     }
 
+    /**
+     * Metoda wywoluje start we wszystkich gameObject'ach
+     */
+    private void stopAllGameObjects() {
+        for (GameObject gameObject : m_listeners)
+            gameObject.exit();
+    }
+
+    /**
+     * Metoda renderuje wszystkie gameObjecty na scenie
+     */
     private void renderGameObjects() {
         m_mainRenderer.prepareScene();
         for (GameObject gameObject : m_listeners)
             m_mainRenderer.renderObject(gameObject);
-    }
-
-    private void stopAllGameObjects(){
-        for (GameObject gameObject : m_listeners)
-            gameObject.exit();
     }
 
 }
