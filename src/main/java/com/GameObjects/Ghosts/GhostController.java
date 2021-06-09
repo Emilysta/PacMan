@@ -69,7 +69,7 @@ public abstract class GhostController implements Runnable {
                     m_ghost.destination=new Vector2((int)m_ghost.getPosition().x/30,(int)m_ghost.getPosition().y/30);
                     switch (m_GhostMode) {
                         case WanderingMode: {
-                            m_ghost.setSprite(new Sprite(new Image("/dead.png"), 30, 30));
+                            m_ghost.setSprite(new Sprite(new Image("/wandering.png"), 30, 30));
                             wanderingMode();
                             break;
                         }
