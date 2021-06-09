@@ -18,12 +18,15 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 
 public class BoardController {
 
@@ -211,8 +214,10 @@ public class BoardController {
      */
     private void addVisuals() {
         Label lbl = new Label();
-        BoardGridPane.add((lbl), 0, 32, 12, 1);
+        BoardGridPane.add((lbl), 0, 31, 28, 1);
         lbl.textProperty().bind(scoreText);
+        lbl.setTextFill(Color.color(1,1,1));
+        GridPane.setHalignment(lbl, HPos.CENTER);
         goToMainWindowButton.setVisible(false);
         tryAgainButton.setVisible(false);
         tryAgainButton.toFront();

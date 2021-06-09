@@ -114,7 +114,7 @@ public class Main extends Application {
      */
     public void goToBoard() {
         try {
-            replaceSceneContent("Board.fxml", 840, 1080);
+            replaceSceneContent("Board.fxml", 840, 960);
         } catch (Exception e) {
             e.printStackTrace();
         }
